@@ -4,11 +4,11 @@
 #include <string>
 #include <sys/socket.h>
 
+#include "socket_global.h"
+
 namespace QtSocket
 {
 #define REPORT_ERR() printf("errno=%d:%s\n", errno, strerror(errno));
-
-typedef int SocketFd;
 
 class Socket
 {
@@ -22,11 +22,18 @@ public:
     void Close();
     SocketFd FD() const { return _sock_fd;}
 
-    bool SetNoBlock();
-    bool SetBlock();
+    void SetNoBlock();
+    void SetBlock();
 
-    void SetSockOpt(int level, int opt_name, const void* opt_val, socklen_t opt_len);
-    void GetSockOpt(int level, int opt_name, void* opt_val, socklen_t* opt_len);
+    void SetSockOpt(int level, int opt_name, const unsigned char opt_val);
+    void SetSockOpt(int level, int opt_name, const int opt_val);
+    void SetSockOpt(int level, int opt_name, const unsigned int opt_val);
+    void SetSockOpt(int level, int opt_name, const struct timeval &opt_val);
+
+    void GetSockOpt(int level, int opt_name, unsigned char &opt_val);
+    void GetSockOpt(int level, int opt_name, int& opt_val);
+    void GetSockOpt(int level, int opt_name, unsigned int &opt_val);
+    void GetSockOpt(int level, int opt_name, struct timeval &opt_val);
 
 protected:
     virtual int CreateFD() = 0;
@@ -48,7 +55,10 @@ public:
     int Send(const char* buffer, int size);
 
     void SetRecvTimeOut(time_t timeout); //seconds
+    time_t GetRecvTimeOut(); //seconds
+
     void SetSendTimeOut(time_t timeout); //seconds
+    time_t GetSendTimeOut(); //seconds
 
 protected:
     int CreateFD() override;

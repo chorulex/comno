@@ -30,12 +30,6 @@ TCPClient::TCPClient(const SocketFd sock_fd, const EndPoint& src, const EndPoint
 
 TCPClient::~TCPClient()noexcept
 {
-    try{
-        if( _sock_fd != -1 )
-            close(_sock_fd);
-    }catch(...) {
-        exit(-1);
-    }
 }
 
 bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
@@ -91,8 +85,7 @@ bool TCPClient::ConnectTimeout(time_t timeout_sec)
         throw SocketException(errno);
 
     int error = -1;
-    size_t err_len = sizeof(error);
-    getsockopt( _sock_fd, SOL_SOCKET, SO_ERROR, &error, (socklen_t*)&err_len);
+    GetSockOpt(SOL_SOCKET, SO_ERROR, error);
     if( error != 0 ){
         throw SocketException(error);
     }else {

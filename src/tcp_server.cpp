@@ -51,8 +51,7 @@ void TCPServer::Bind(const unsigned int port)
 
 void TCPServer::SetReuseAddr(bool use)
 {
-    int yes = use ? 1 : 0;
-    SetSockOpt(SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (yes));
+    SetSockOpt(SOL_SOCKET, SO_REUSEADDR, use ? 1 : 0);
 }
 
 TCPClient TCPServer::Accept()

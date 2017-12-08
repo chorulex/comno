@@ -12,6 +12,11 @@ public:
     TCPClient() noexcept;
     TCPClient(const SocketFd sock_fd)noexcept;
     TCPClient(const SocketFd sock_fd, const EndPoint& src, const EndPoint& dest)noexcept;
+
+    /**
+     * not close socket fd on this calling.
+     * close fd manually.
+     */
     ~TCPClient() noexcept;
 
 public:

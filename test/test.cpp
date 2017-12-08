@@ -18,6 +18,25 @@ const char* PROMPT_STR = ">> ";
 #define TEST_PROMPT(func) printf("[%s] --- RUNNING\n", func);
 #define ERR_PROMPT() printf("line:%d, error:%s.\n", __LINE__, ex.what());
 
+void TestSockOpt()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    QtSocket::TCPClient client;
+
+    int rec_buff_size = 2048;
+    client.SetSockOpt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
+    client.GetSockOpt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
+    assert( rec_buff_size > 0 );
+
+    time_t timeout = 3;
+    client.SetRecvTimeOut(timeout);
+    assert( client.GetRecvTimeOut() == timeout );
+
+    client.SetSendTimeOut(timeout);
+    assert( client.GetSendTimeOut() == timeout );
+}
+
 void TestConnect()
 {
     TEST_PROMPT(__FUNCTION__);
@@ -25,7 +44,7 @@ void TestConnect()
     QtSocket::TCPClient socket;
 
     try{
-        QtSocket::EndPoint host("192.168.2.186", 20000);
+        QtSocket::EndPoint host("192.168.2.186", 30000);
         socket.Connect(host);
     }catch(QtSocket::SocketException& ex){
         assert(ex.GetErrCode() == ECONNREFUSED );
@@ -152,20 +171,21 @@ void TestAccept()
 
     std::thread listen_thread([]{
         QtSocket::TCPServer srv;
+        srv.SetReuseAddr(true);
         srv.Listen(20000);
 
         QtSocket::TCPClient client = srv.Accept();
         assert(client.DestPort() == 20000);
         assert(client.DestIP().empty());
 
-        assert(client.SrcIP() == "192.168.2.101");
+        assert(client.SrcIP() == "127.0.0.1");
         assert(client.SrcPort() == 0);
     });
 
     std::thread client_thread([]{
         std::this_thread::sleep_for(std::chrono::seconds(5));
 
-        EndPoint host("192.168.2.101", 20000);
+        EndPoint host("127.0.0.1", 20000);
         QtSocket::TCPClient client;
         client.Connect(host);
     });
@@ -178,6 +198,7 @@ void TestAccept()
 
 int main(int argc, char* argv[])
 {
+    TestSockOpt();
     TestAccept();
 
     TestConnect();
