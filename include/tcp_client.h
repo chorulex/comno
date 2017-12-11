@@ -1,5 +1,5 @@
-#ifndef _ET_TCP_CLIENT_SOCKET_H_
-#define _ET_TCP_CLIENT_SOCKET_H_
+#ifndef _QT_TCP_CLIENT_SOCKET_H_
+#define _QT_TCP_CLIENT_SOCKET_H_
 
 #include "end_point.h"
 #include "socket.h"

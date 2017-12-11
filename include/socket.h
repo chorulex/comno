@@ -19,7 +19,7 @@ public:
     virtual ~Socket() = default;
 
 public:
-    void Close();
+    virtual void Close();
     SocketFd FD() const { return _sock_fd;}
 
     void SetNoBlock();
@@ -61,7 +61,7 @@ public:
     time_t GetSendTimeOut(); //seconds
 
 protected:
-    int CreateFD() override;
+    virtual int CreateFD() override;
 };
 
 }

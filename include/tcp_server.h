@@ -1,5 +1,5 @@
-#ifndef _ET_TCP_SOCKET_H_
-#define _ET_TCP_SOCKET_H_
+#ifndef _QT_TCP_SERVER_SOCKET_H_
+#define _QT_TCP_SERVER_SOCKET_H_
 
 #include <string>
 
@@ -10,6 +10,9 @@
 
 namespace QtSocket
 {
+/**
+ * AF_INET | SOCK_STREAM | IPPROTO_TCP
+ */
 class TCPServer : public TCPSocket
 {
 public:

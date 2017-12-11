@@ -10,7 +10,7 @@ class SocketException : public std::exception
 {
 public:
     SocketException(int err);
-    int GetErrCode() const { return _errno;}
+    int ErrorCode() const { return _errno;}
 
 public:
     virtual const char* what() const noexcept;

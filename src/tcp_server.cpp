@@ -27,7 +27,7 @@ bool TCPServer::Listen(const unsigned int port)
 
     Bind(port);
 
-    int res = listen(_sock_fd, 10);
+    int res = ::listen(_sock_fd, 10);
     if (res < 0) {
         throw SocketException(errno);
     }
@@ -59,7 +59,7 @@ TCPClient TCPServer::Accept()
     struct sockaddr_in clientAddr;
     socklen_t cliLen = sizeof(clientAddr);
 
-    int clientSocket = accept(_sock_fd, (struct sockaddr *)&clientAddr, &cliLen);
+    int clientSocket = ::accept(_sock_fd, (struct sockaddr *)&clientAddr, &cliLen);
     if (clientSocket == -1 ) {
         throw SocketException(errno);
     }

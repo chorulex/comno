@@ -11,7 +11,6 @@
 
 namespace QtSocket
 {
-
 TCPClient::TCPClient()noexcept
 {
     _sock_fd = TCPSocket::CreateFD();
