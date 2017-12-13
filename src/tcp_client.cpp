@@ -31,21 +31,30 @@ TCPClient::~TCPClient()noexcept
 {
 }
 
+/**
+ * Call Close() to close and reset fd before recall this to reconnect to other host.
+ */
 bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
 {
-    if ( _sock_fd == -1 )
-        return false;
+    if ( _sock_fd == -1 ){
+        _sock_fd = TCPSocket::CreateFD();
+        if ( _sock_fd == -1 )
+            throw SocketException(errno);
+    }
 
     sockaddr_in server_address;
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_port    = htons(host.port);
-    if(inet_aton(host.ip.c_str(), &server_address.sin_addr) == 0)
+    if(inet_aton(host.ip.c_str(), &server_address.sin_addr) == 0){
+        Close();
         throw SocketException(EINVAL);
+    }
 
     // until to success or fail
     if( timeout_sec == 0 ){
         if (connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
+            Close();
             throw SocketException(errno);
             return false;
         }
