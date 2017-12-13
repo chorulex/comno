@@ -62,8 +62,12 @@ bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
         SetNoBlock();
         int ret = connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address));
         if( ret == -1 ){
-            if( ConnectTimeout(timeout_sec) )
-                return false;
+            try{
+                ConnectTimeout(timeout_sec);
+            }catch(...){
+                Close();
+                throw;
+            }
         }
 
         SetBlock();
@@ -89,8 +93,10 @@ bool TCPClient::ConnectTimeout(time_t timeout_sec)
     FD_SET(_sock_fd, &fset);
 
     int res = select(_sock_fd+1, NULL, &fset, NULL, &time_val);
-    if( res <= 0 )
+    if( res <= 0 ){
+        Close();
         throw SocketException(errno);
+    }
 
     int error = -1;
     GetSockOpt(SOL_SOCKET, SO_ERROR, error);
