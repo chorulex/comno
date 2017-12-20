@@ -15,12 +15,12 @@ tcp_client::tcp_client()noexcept
 {
     _sock_fd = tcp_socket::create_fd();
 }
-tcp_client::tcp_client(const SocketFd sock_fd)noexcept
+tcp_client::tcp_client(const socket_t sock_fd)noexcept
 {
     _sock_fd = sock_fd;
 }
 
-tcp_client::tcp_client(const SocketFd sock_fd, const end_point& src, const end_point& dest)noexcept
+tcp_client::tcp_client(const socket_t sock_fd, const end_point& src, const end_point& dest)noexcept
 {
     _sock_fd = sock_fd;
     _src_end_point = src;

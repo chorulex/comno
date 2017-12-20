@@ -1,5 +1,5 @@
-#ifndef _QT_END_POINT_H_
-#define _QT_END_POINT_H_
+#ifndef _COMNO_END_POINT_H_
+#define _COMNO_END_POINT_H_
 
 #include <string>
 

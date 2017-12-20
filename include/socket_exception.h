@@ -1,5 +1,5 @@
-#ifndef _QT_SOCKET_EXCEPTION_H_
-#define _QT_SOCKET_EXCEPTION_H_
+#ifndef _COMNO_SOCKET_EXCEPTION_H_
+#define _COMNO_SOCKET_EXCEPTION_H_
 
 #include <exception>
 #include "error_code.h"

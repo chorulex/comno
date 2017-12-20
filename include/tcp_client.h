@@ -1,5 +1,5 @@
-#ifndef _QT_TCP_CLIENT_SOCKET_H_
-#define _QT_TCP_CLIENT_SOCKET_H_
+#ifndef _COMNO_TCP_CLIENT_SOCKET_H_
+#define _COMNO_TCP_CLIENT_SOCKET_H_
 
 #include "end_point.h"
 #include "socket.h"
@@ -10,8 +10,8 @@ class tcp_client : public tcp_socket
 {
 public:
     tcp_client() noexcept;
-    tcp_client(const SocketFd sock_fd)noexcept;
-    tcp_client(const SocketFd sock_fd, const end_point& src, const end_point& dest)noexcept;
+    tcp_client(const socket_t sock_fd)noexcept;
+    tcp_client(const socket_t sock_fd, const end_point& src, const end_point& dest) noexcept;
 
     /**
      * not close socket fd on this calling.

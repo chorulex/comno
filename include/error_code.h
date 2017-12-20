@@ -1,5 +1,5 @@
-#ifndef _QT_ERROR_CODE_H_
-#define _QT_ERROR_CODE_H_
+#ifndef _COMNO_ERROR_CODE_H_
+#define _COMNO_ERROR_CODE_H_
 
 #include <errno.h>
 

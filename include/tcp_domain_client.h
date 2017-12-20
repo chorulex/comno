@@ -1,5 +1,5 @@
-#ifndef _QT_TCP_DOMAIN_CLIENT_SOCKET_H_
-#define _QT_TCP_DOMAIN_CLIENT_SOCKET_H_
+#ifndef _COMNO_TCP_DOMAIN_CLIENT_SOCKET_H_
+#define _COMNO_TCP_DOMAIN_CLIENT_SOCKET_H_
 
 #include "socket.h"
 
@@ -9,7 +9,7 @@ class tcp_domain_client : public tcp_socket
 {
 public:
     tcp_domain_client() noexcept;
-    tcp_domain_client(const SocketFd sock_fd, const std::string& domain_file) noexcept;
+    tcp_domain_client(const socket_t sock_fd, const std::string& domain_file) noexcept;
 
     /**
      * not close socket fd on this calling.

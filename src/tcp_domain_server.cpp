@@ -15,7 +15,7 @@ tcp_domain_server::tcp_domain_server()
 {
     _sock_fd = create_fd();
 }
-tcp_domain_server::tcp_domain_server(const SocketFd sock_fd, const std::string& path)
+tcp_domain_server::tcp_domain_server(const socket_t sock_fd, const std::string& path)
 {
     _sock_fd = sock_fd;
     _domain_file = path;

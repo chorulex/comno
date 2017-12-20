@@ -1,5 +1,5 @@
-#ifndef _QT_TCP_DOMAIN_SERVER_SOCKET_H_
-#define _QT_TCP_DOMAIN_SERVER_SOCKET_H_
+#ifndef _COMNO_TCP_DOMAIN_SERVER_SOCKET_H_
+#define _COMNO_TCP_DOMAIN_SERVER_SOCKET_H_
 
 #include <string>
 
@@ -17,7 +17,7 @@ class tcp_domain_server : public tcp_socket
 {
 public:
     tcp_domain_server();
-    tcp_domain_server(const SocketFd sock_fd, const std::string& file);
+    tcp_domain_server(const socket_t sock_fd, const std::string& file);
     ~tcp_domain_server();
 
 public:

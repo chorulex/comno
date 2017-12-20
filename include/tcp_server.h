@@ -1,5 +1,5 @@
-#ifndef _QT_TCP_SERVER_SOCKET_H_
-#define _QT_TCP_SERVER_SOCKET_H_
+#ifndef _COMNO_TCP_SERVER_SOCKET_H_
+#define _COMNO_TCP_SERVER_SOCKET_H_
 
 #include <string>
 
@@ -17,7 +17,7 @@ class tcp_server : public tcp_socket
 {
 public:
     tcp_server();
-    tcp_server(const SocketFd sock_fd);
+    tcp_server(const socket_t  sock_fd);
     ~tcp_server();
 
 public:

@@ -1,9 +1,10 @@
-#ifndef _QT_SOCKET_H_
-#define _QT_SOCKET_H_
+#ifndef _COMNO_SOCKET_H_
+#define _COMNO_SOCKET_H_
 
 #include <string>
 #include <sys/socket.h>
 
+#include "socket_t.h"
 #include "socket_global.h"
 
 namespace comno
@@ -18,7 +19,7 @@ public:
 
 public:
     virtual void close();
-    SocketFd fd() const { return _sock_fd;}
+    socket_t fd() const { return _sock_fd;}
 
     void set_no_block();
     void set_block();
@@ -37,7 +38,7 @@ protected:
     virtual int create_fd() = 0;
 
 protected:
-    SocketFd _sock_fd;
+    socket_t _sock_fd;
 };
 
 class tcp_socket : public socket
