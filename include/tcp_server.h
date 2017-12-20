@@ -8,27 +8,27 @@
 #include "tcp_client.h"
 #include "socket_exception.h"
 
-namespace QtSocket
+namespace comno
 {
 /**
  * AF_INET | SOCK_STREAM | IPPROTO_TCP
  */
-class TCPServer : public TCPSocket
+class tcp_server : public tcp_socket
 {
 public:
-    TCPServer();
-    TCPServer(const SocketFd sock_fd);
-    ~TCPServer();
+    tcp_server();
+    tcp_server(const SocketFd sock_fd);
+    ~tcp_server();
 
 public:
-    void SetReuseAddr(bool use);
-    bool Listen(const unsigned int port);
-    TCPClient Accept();
+    void set_reuse_addr(bool use);
+    bool listen(const unsigned int port);
+    tcp_client accept();
 
-    unsigned int ListenPort() const { return _listen_port;}
+    unsigned int listen_port() const { return _listen_port;}
 
 private:
-    void Bind(const unsigned int port);
+    void bind(const unsigned int port);
 
 private:
     unsigned int _listen_port{0};

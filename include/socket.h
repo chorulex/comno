@@ -6,62 +6,60 @@
 
 #include "socket_global.h"
 
-namespace QtSocket
+namespace comno
 {
-#define REPORT_ERR() printf("errno=%d:%s\n", errno, strerror(errno));
-
-class Socket
+class socket
 {
 protected:
-    Socket() = default;
+    socket() = default;
 
 public:
-    virtual ~Socket() = default;
+    virtual ~socket() = default;
 
 public:
-    virtual void Close();
-    SocketFd FD() const { return _sock_fd;}
+    virtual void close();
+    SocketFd fd() const { return _sock_fd;}
 
-    void SetNoBlock();
-    void SetBlock();
+    void set_no_block();
+    void set_block();
 
-    void SetSockOpt(int level, int opt_name, const unsigned char opt_val);
-    void SetSockOpt(int level, int opt_name, const int opt_val);
-    void SetSockOpt(int level, int opt_name, const unsigned int opt_val);
-    void SetSockOpt(int level, int opt_name, const struct timeval &opt_val);
+    void set_sock_opt(int level, int opt_name, const unsigned char opt_val);
+    void set_sock_opt(int level, int opt_name, const int opt_val);
+    void set_sock_opt(int level, int opt_name, const unsigned int opt_val);
+    void set_sock_opt(int level, int opt_name, const struct timeval &opt_val);
 
-    void GetSockOpt(int level, int opt_name, unsigned char &opt_val);
-    void GetSockOpt(int level, int opt_name, int& opt_val);
-    void GetSockOpt(int level, int opt_name, unsigned int &opt_val);
-    void GetSockOpt(int level, int opt_name, struct timeval &opt_val);
+    void get_sock_opt(int level, int opt_name, unsigned char &opt_val);
+    void get_sock_opt(int level, int opt_name, int& opt_val);
+    void get_sock_opt(int level, int opt_name, unsigned int &opt_val);
+    void get_sock_opt(int level, int opt_name, struct timeval &opt_val);
 
 protected:
-    virtual int CreateFD() = 0;
+    virtual int create_fd() = 0;
 
 protected:
     SocketFd _sock_fd;
 };
 
-class TCPSocket : public Socket
+class tcp_socket : public socket
 {
 protected:
-    TCPSocket() = default;
+    tcp_socket() = default;
 
 public:
-    virtual ~TCPSocket() = default;
+    virtual ~tcp_socket() = default;
 
-    int Recv(char* buffer, int max_len);
-    int Send(const std::string& buffer);
-    int Send(const char* buffer, int size);
+    int recv(char* buffer, int max_len);
+    int send(const std::string& buffer);
+    int send(const char* buffer, int size);
 
-    void SetRecvTimeOut(time_t timeout); //seconds
-    time_t GetRecvTimeOut(); //seconds
+    void   set_recv_timeout(time_t timeout); //seconds
+    time_t get_recv_timeout(); //seconds
 
-    void SetSendTimeOut(time_t timeout); //seconds
-    time_t GetSendTimeOut(); //seconds
+    void   set_send_timeout(time_t timeout); //seconds
+    time_t get_send_timeout(); //seconds
 
 protected:
-    virtual int CreateFD() override;
+    virtual int create_fd() override;
 };
 
 }

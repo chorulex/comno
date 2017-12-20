@@ -3,13 +3,13 @@
 
 #include <string>
 
-namespace QtSocket
+namespace comno
 {
-struct EndPoint
+struct end_point
 {
-    EndPoint() : port(0){}
-    EndPoint(const EndPoint& src) : ip(src.ip), port(src.port){}
-    EndPoint(const std::string& ip_, unsigned int port_) : ip(ip_), port(port_){}
+    end_point() : port(0){}
+    end_point(const end_point& src) : ip(src.ip), port(src.port){}
+    end_point(const std::string& ip_, unsigned int port_) : ip(ip_), port(port_){}
 
     std::string ip;
     unsigned int port;

@@ -8,28 +8,28 @@
 #include "tcp_domain_client.h"
 #include "socket_exception.h"
 
-namespace QtSocket
+namespace comno
 {
 /**
  * AF_UNIX | SOCK_STREAM | IPPROTO_TCP
  */
-class TCPDomainServer : public TCPSocket
+class tcp_domain_server : public tcp_socket
 {
 public:
-    TCPDomainServer();
-    TCPDomainServer(const SocketFd sock_fd, const std::string& file);
-    ~TCPDomainServer();
+    tcp_domain_server();
+    tcp_domain_server(const SocketFd sock_fd, const std::string& file);
+    ~tcp_domain_server();
 
 public:
-    bool Listen(const std::string& file);
-    TCPDomainClient Accept();
-    void Close() override;
+    bool listen(const std::string& file);
+    tcp_domain_client accept();
+    void close() override;
 
-    const std::string& DomainFile() const { return _domain_file;}
+    const std::string& domain_file() const { return _domain_file;}
 
 private:
-    int CreateFD() override;
-    void Bind(const std::string& file);
+    int create_fd() override;
+    void bind(const std::string& file);
 
 private:
     std::string _domain_file;

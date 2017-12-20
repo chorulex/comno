@@ -9,28 +9,28 @@
 
 #include "tcp_domain_server.h"
 
-namespace QtSocket
+namespace comno
 {
-TCPDomainServer::TCPDomainServer()
+tcp_domain_server::tcp_domain_server()
 {
-    _sock_fd = CreateFD();
+    _sock_fd = create_fd();
 }
-TCPDomainServer::TCPDomainServer(const SocketFd sock_fd, const std::string& path)
+tcp_domain_server::tcp_domain_server(const SocketFd sock_fd, const std::string& path)
 {
     _sock_fd = sock_fd;
     _domain_file = path;
 }
-TCPDomainServer::~TCPDomainServer()
+tcp_domain_server::~tcp_domain_server()
 {
-    Close();
+    close();
 }
 
-int TCPDomainServer::CreateFD()
+int tcp_domain_server::create_fd()
 {
     return ::socket(AF_UNIX, SOCK_STREAM, 0);
 }
 
-void TCPDomainServer::Close()
+void tcp_domain_server::close()
 {
     if( _sock_fd != -1 ){
         ::close(_sock_fd);
@@ -40,26 +40,26 @@ void TCPDomainServer::Close()
     }
 }
 
-bool TCPDomainServer::Listen(const std::string& path)
+bool tcp_domain_server::listen(const std::string& path)
 {
     if (_sock_fd < 0) 
         return false;
 
-    Bind(path);
+    this->bind(path);
 
     int res = ::listen(_sock_fd, 10);
     if (res < 0) 
-        throw SocketException(ErrorCode(errno));
+        throw socket_exception(error_code(errno));
 
     _domain_file = path;
     return true;
 }
 
-void TCPDomainServer::Bind(const std::string& path)
+void tcp_domain_server::bind(const std::string& path)
 {
     struct sockaddr_un serverAddr;
     if(path.size() >= sizeof(serverAddr.sun_path))
-        throw SocketException(ErrorCode(ENAVAIL));
+        throw socket_exception(error_code(ENAVAIL));
 
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sun_family = AF_UNIX;
@@ -69,18 +69,18 @@ void TCPDomainServer::Bind(const std::string& path)
     std::size_t len = offsetof(struct sockaddr_un, sun_path) + strlen(serverAddr.sun_path);
     int res = ::bind(_sock_fd, (struct sockaddr *)&serverAddr, len);
     if( res == -1 )
-        throw SocketException(ErrorCode(errno));
+        throw socket_exception(error_code(errno));
 }
 
-TCPDomainClient TCPDomainServer::Accept() 
+tcp_domain_client tcp_domain_server::accept() 
 { 
     sockaddr_un clientAddr; 
     unsigned int cliLen = sizeof(clientAddr); 
  
     int clientSocket = ::accept(_sock_fd, (sockaddr*)&clientAddr, &cliLen); 
     if (clientSocket == -1 )
-        throw SocketException(ErrorCode(errno));
+        throw socket_exception(error_code(errno));
     
-    return TCPDomainClient(clientSocket, _domain_file);
+    return tcp_domain_client(clientSocket, _domain_file);
 }
 }

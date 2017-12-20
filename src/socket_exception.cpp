@@ -2,14 +2,14 @@
 
 #include "socket_exception.h"
 
-namespace QtSocket
+namespace comno
 {
 
-SocketException::SocketException(const ErrorCode& err) : _errno(err.value())
+socket_exception::socket_exception(const comno::error_code& err) : _errno(err.value())
 {
 }
 
-const char* SocketException::what() const noexcept
+const char* socket_exception::what() const noexcept
 {
     std::string err("socket error: ");
     err.append(_errno.to_string());

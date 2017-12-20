@@ -4,38 +4,33 @@
 #include "end_point.h"
 #include "socket.h"
 
-namespace QtSocket
+namespace comno
 {
-class TCPClient : public TCPSocket
+class tcp_client : public tcp_socket
 {
 public:
-    TCPClient() noexcept;
-    TCPClient(const SocketFd sock_fd)noexcept;
-    TCPClient(const SocketFd sock_fd, const EndPoint& src, const EndPoint& dest)noexcept;
+    tcp_client() noexcept;
+    tcp_client(const SocketFd sock_fd)noexcept;
+    tcp_client(const SocketFd sock_fd, const end_point& src, const end_point& dest)noexcept;
 
     /**
      * not close socket fd on this calling.
      * close fd manually.
      */
-    ~TCPClient() noexcept;
+    ~tcp_client() noexcept;
 
 public:
-    bool Connect(const EndPoint& host, time_t timeout_sec = 0);
+    bool connect(const end_point& host, time_t timeout_sec = 0);
 
-    EndPoint DestEndPoint() const { return _dest_end_point;}
-    std::string DestIP() const { return _dest_end_point.ip;}
-    unsigned int DestPort() const { return _dest_end_point.port;}
-
-    EndPoint SrcEndPoint() const { return _src_end_point;}
-    std::string SrcIP() const { return _src_end_point.ip;}
-    unsigned int SrcPort() const { return _src_end_point.port;}
+    end_point dest_end_point() const { return _dest_end_point;}
+    end_point src_end_point() const { return _src_end_point;}
 
 private:
-    bool ConnectTimeout(time_t timeout_sec);
+    bool connect_timeout(time_t timeout_sec);
 
 private:
-    EndPoint _dest_end_point;
-    EndPoint _src_end_point;
+    end_point _dest_end_point;
+    end_point _src_end_point;
 };
 
 }

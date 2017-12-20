@@ -3,26 +3,26 @@
 
 #include "socket.h"
 
-namespace QtSocket
+namespace comno
 {
-class TCPDomainClient : public TCPSocket
+class tcp_domain_client : public tcp_socket
 {
 public:
-    TCPDomainClient() noexcept;
-    TCPDomainClient(const SocketFd sock_fd, const std::string& domain_file) noexcept;
+    tcp_domain_client() noexcept;
+    tcp_domain_client(const SocketFd sock_fd, const std::string& domain_file) noexcept;
 
     /**
      * not close socket fd on this calling.
      * close fd manually.
      */
-    ~TCPDomainClient() noexcept;
+    ~tcp_domain_client() noexcept;
 
 public:
-    bool Connect(const std::string& domain_file);
-    const std::string& DomainFile() const { return _domain_file;}
+    bool connect(const std::string& domain_file);
+    const std::string& domain_file() const { return _domain_file;}
 
 private:
-    int CreateFD();
+    int create_fd() override;
 
 private:
     std::string _domain_file;

@@ -9,37 +9,37 @@
 #include "tcp_client.h"
 #include "socket_exception.h"
 
-namespace QtSocket
+namespace comno
 {
-TCPClient::TCPClient()noexcept
+tcp_client::tcp_client()noexcept
 {
-    _sock_fd = TCPSocket::CreateFD();
+    _sock_fd = tcp_socket::create_fd();
 }
-TCPClient::TCPClient(const SocketFd sock_fd)noexcept
+tcp_client::tcp_client(const SocketFd sock_fd)noexcept
 {
     _sock_fd = sock_fd;
 }
 
-TCPClient::TCPClient(const SocketFd sock_fd, const EndPoint& src, const EndPoint& dest)noexcept
+tcp_client::tcp_client(const SocketFd sock_fd, const end_point& src, const end_point& dest)noexcept
 {
     _sock_fd = sock_fd;
     _src_end_point = src;
     _dest_end_point = dest;
 }
 
-TCPClient::~TCPClient()noexcept
+tcp_client::~tcp_client()noexcept
 {
 }
 
 /**
  * Call Close() to close and reset fd before recall this to reconnect to other host.
  */
-bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
+bool tcp_client::connect(const end_point& host, time_t timeout_sec)
 {
     if ( _sock_fd == -1 ){
-        _sock_fd = TCPSocket::CreateFD();
+        _sock_fd = tcp_socket::create_fd();
         if ( _sock_fd == -1 )
-            throw SocketException(ErrorCode(errno));
+            throw socket_exception(error_code(errno));
     }
 
     sockaddr_in server_address;
@@ -47,30 +47,30 @@ bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
     server_address.sin_family = AF_INET;
     server_address.sin_port    = htons(host.port);
     if(inet_aton(host.ip.c_str(), &server_address.sin_addr) == 0){
-        Close();
-        throw SocketException(ErrorCode(EINVAL));
+        close();
+        throw socket_exception(error_code(EINVAL));
     }
 
     // until to success or fail
     if( timeout_sec == 0 ){
-        if (connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
-            Close();
-            throw SocketException(ErrorCode(errno));
+        if (::connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
+            close();
+            throw socket_exception(error_code(errno));
             return false;
         }
     }else{
-        SetNoBlock();
-        int ret = connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address));
+        set_no_block();
+        int ret = ::connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address));
         if( ret == -1 ){
             try{
-                ConnectTimeout(timeout_sec);
+                connect_timeout(timeout_sec);
             }catch(...){
-                Close();
+                close();
                 throw;
             }
         }
 
-        SetBlock();
+        set_block();
     }
 
     _dest_end_point = host;
@@ -80,9 +80,9 @@ bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
 /**
  * return value:
  * false: connect successfully.
- * throw EtSocketException obj.
+ * throw Etsocket_exception obj.
  */
-bool TCPClient::ConnectTimeout(time_t timeout_sec)
+bool tcp_client::connect_timeout(time_t timeout_sec)
 {
     struct timeval time_val;
     time_val.tv_sec = timeout_sec;
@@ -94,19 +94,19 @@ bool TCPClient::ConnectTimeout(time_t timeout_sec)
 
     int res = select(_sock_fd+1, NULL, &fset, NULL, &time_val);
     if( res <= 0 ){
-        Close();
-        throw SocketException(ErrorCode(errno));
+        close();
+        throw socket_exception(error_code(errno));
     }
 
     int error = -1;
-    GetSockOpt(SOL_SOCKET, SO_ERROR, error);
+    get_sock_opt(SOL_SOCKET, SO_ERROR, error);
     if( error != 0 ){
-        throw SocketException(ErrorCode(error));
+        throw socket_exception(error_code(error));
     }else {
         if( errno == EINPROGRESS )
-            throw SocketException(ErrorCode(ETIMEDOUT));
+            throw socket_exception(error_code(ETIMEDOUT));
         else
-            throw SocketException(ErrorCode(errno));
+            throw socket_exception(error_code(errno));
     }
 
     return false;

@@ -3,18 +3,18 @@
 
 #include <string>
 
-namespace QtSocket
+namespace comno
 {
 typedef int SocketFd;
 
-extern void Close(const SocketFd sock_fd);
+extern void close(const SocketFd sock_fd);
 
-extern void SetBlock(const SocketFd sock_fd, bool blocked);
-extern int Send(const SocketFd sock_fd, const std::string& buffer);
-extern int Send(const SocketFd sock_fd, const char* buffer, int size);
+extern void set_block(const SocketFd sock_fd, bool blocked);
+extern int send(const SocketFd sock_fd, const std::string& buffer);
+extern int send(const SocketFd sock_fd, const char* buffer, int size);
 
-extern void SetSockOpt(const SocketFd sock_fd, int level, int opt_name, const void* opt_val, socklen_t opt_len);
-extern void GetSockOpt(const SocketFd sock_fd, int level, int opt_name, void* opt_val, socklen_t* opt_len);
+extern void set_sock_opt(const SocketFd sock_fd, int level, int opt_name, const void* opt_val, socklen_t opt_len);
+extern void get_sock_opt(const SocketFd sock_fd, int level, int opt_name, void* opt_val, socklen_t* opt_len);
 }
 
 #endif

@@ -8,35 +8,35 @@
 
 #include "tcp_server.h"
 
-namespace QtSocket
+namespace comno
 {
-TCPServer::TCPServer()
+tcp_server::tcp_server()
 {
-    _sock_fd = TCPSocket::CreateFD();
+    _sock_fd = tcp_socket::create_fd();
 }
-TCPServer::~TCPServer()
+tcp_server::~tcp_server()
 {
     if( _sock_fd != -1 )
         ::close(_sock_fd);
 }
 
-bool TCPServer::Listen(const unsigned int port)
+bool tcp_server::listen(const unsigned int port)
 {
     if (_sock_fd < 0) 
         return false;
 
-    Bind(port);
+    bind(port);
 
     int res = ::listen(_sock_fd, 10);
     if (res < 0) {
-        throw SocketException(ErrorCode(errno));
+        throw socket_exception(error_code(errno));
     }
 
     _listen_port = port;
     return true;
 }
 
-void TCPServer::Bind(const unsigned int port)
+void tcp_server::bind(const unsigned int port)
 {
     struct sockaddr_in serverAddr;
     memset(&serverAddr, 0, sizeof(serverAddr));
@@ -46,29 +46,29 @@ void TCPServer::Bind(const unsigned int port)
 
     int res = ::bind(_sock_fd, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
     if( res == -1 )
-        throw SocketException(ErrorCode(errno));
+        throw socket_exception(error_code(errno));
 }
 
-void TCPServer::SetReuseAddr(bool use)
+void tcp_server::set_reuse_addr(bool use)
 {
-    SetSockOpt(SOL_SOCKET, SO_REUSEADDR, use ? 1 : 0);
+    set_sock_opt(SOL_SOCKET, SO_REUSEADDR, use ? 1 : 0);
 }
 
-TCPClient TCPServer::Accept()
+tcp_client tcp_server::accept()
 {
     struct sockaddr_in clientAddr;
     socklen_t cliLen = sizeof(clientAddr);
 
     int clientSocket = ::accept(_sock_fd, (struct sockaddr *)&clientAddr, &cliLen);
     if (clientSocket == -1 ) {
-        throw SocketException(ErrorCode(errno));
+        throw socket_exception(error_code(errno));
     }
 
-    EndPoint dest, src;
-    dest.port = ListenPort();
+    end_point dest, src;
+    dest.port = listen_port();
     src.ip = ::inet_ntoa(clientAddr.sin_addr);
 
-    return TCPClient(clientSocket, src, dest);
+    return tcp_client(clientSocket, src, dest);
 }
 
 }

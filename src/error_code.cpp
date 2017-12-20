@@ -3,11 +3,11 @@
 
 #include "error_code.h"
 
-namespace QtSocket
+namespace comno
 {
 #define __error_code_name__(errno) case errno: return #errno;
 
-const char* ErrorCode::to_string() const
+const char* error_code::to_string() const
 {
     switch(_errno){
         __error_code_name__(EPERM)
@@ -149,7 +149,7 @@ const char* ErrorCode::to_string() const
     return "unknown";
 }
 
-const char* ErrorCode::details() const
+const char* error_code::details() const
 {
     return ::strerror(_errno);
 }

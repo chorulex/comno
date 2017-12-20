@@ -4,20 +4,20 @@
 #include <exception>
 #include "error_code.h"
 
-namespace QtSocket
+namespace comno
 {
 
-class SocketException : public std::exception
+class socket_exception : public std::exception
 {
 public:
-    SocketException(const ErrorCode& err);
+    socket_exception(const comno::error_code& err);
     int error_code() const { return _errno.value();}
 
 public:
     virtual const char* what() const noexcept;
 
 private:
-    ErrorCode _errno;
+    comno::error_code _errno;
 };
 
 }

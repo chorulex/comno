@@ -3,14 +3,14 @@
 
 #include <errno.h>
 
-namespace QtSocket
+namespace comno
 {
-class ErrorCode
+class error_code
 {
 public:
-    explicit ErrorCode(int err) : _errno (err){}
-    ErrorCode(const ErrorCode& src) : _errno(src._errno){}
-    ErrorCode& operator= (const ErrorCode& src)
+    explicit error_code(int err) : _errno (err){}
+    error_code(const error_code& src) : _errno(src._errno){}
+    error_code& operator= (const error_code& src)
     {
         _errno = src._errno;
         return *this;

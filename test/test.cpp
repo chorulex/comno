@@ -14,7 +14,7 @@
 #include "tcp_domain_client.h"
 #include "tcp_domain_server.h"
 
-using namespace QtSocket;
+using namespace comno;
 
 const char* PROMPT_STR = ">> ";
 #define TEST_PROMPT(func) printf("[%s] --- RUNNING\n", func);
@@ -24,59 +24,59 @@ void TestSockOpt()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    QtSocket::TCPClient client;
+    comno::tcp_client client;
 
     int rec_buff_size = 2048;
-    client.SetSockOpt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
-    client.GetSockOpt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
+    client.set_sock_opt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
+    client.get_sock_opt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
     assert( rec_buff_size > 0 );
 
     time_t timeout = 3;
-    client.SetRecvTimeOut(timeout);
-    assert( client.GetRecvTimeOut() == timeout );
+    client.set_recv_timeout(timeout);
+    assert( client.get_recv_timeout() == timeout );
 
-    client.SetSendTimeOut(timeout);
-    assert( client.GetSendTimeOut() == timeout );
+    client.set_send_timeout(timeout);
+    assert( client.get_send_timeout() == timeout );
 }
 
 void TestConnect()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    QtSocket::TCPClient socket;
+    comno::tcp_client socket;
 
     try{
-        QtSocket::EndPoint host("192.168.2.186", 30000);
-        socket.Connect(host);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.186", 30000);
+        socket.connect(host);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == ECONNREFUSED );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.600", 20000); //no this host
-        socket.Connect(host);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.600", 20000); //no this host
+        socket.connect(host);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EINVAL );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.0", 20000); //no this host
-        socket.Connect(host);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.0", 20000); //no this host
+        socket.connect(host);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == ENETUNREACH );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.16", 20000); //no this host
-        socket.Connect(host);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.16", 20000); //no this host
+        socket.connect(host);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EHOSTUNREACH );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2", 20000); //no this host
-        socket.Connect(host);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2", 20000); //no this host
+        socket.connect(host);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == ETIMEDOUT );
     }
 }
@@ -85,47 +85,47 @@ void TestConnectTimeout()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    QtSocket::TCPClient socket;
+    comno::tcp_client socket;
 
     try{
-        QtSocket::EndPoint host("192.168.2.186", 20000);
-        socket.Connect(host, 3);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.186", 20000);
+        socket.connect(host, 3);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == ECONNREFUSED );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.186", 20000);
-        socket.Connect(host, 3);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.186", 20000);
+        socket.connect(host, 3);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == ECONNABORTED );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.600", 20000); //no this host
-        socket.Connect(host, 3);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.600", 20000); //no this host
+        socket.connect(host, 3);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EINVAL );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2", 20000); //no this host
-        socket.Connect(host, 3);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2", 20000); //no this host
+        socket.connect(host, 3);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EINPROGRESS );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.0", 20000); //no this host
-        socket.Connect(host, 3);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.0", 20000); //no this host
+        socket.connect(host, 3);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EALREADY );
     }
 
     try{
-        QtSocket::EndPoint host("192.168.2.16", 20000); //no this host
-        socket.Connect(host, 3);
-    }catch(QtSocket::SocketException& ex){
+        comno::end_point host("192.168.2.16", 20000); //no this host
+        socket.connect(host, 3);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EALREADY );
     }
 }
@@ -133,36 +133,36 @@ void TestConnectTimeout()
 void TestListen()
 {
     TEST_PROMPT(__FUNCTION__);
-    QtSocket::TCPServer srv;
+    comno::tcp_server srv;
 
     try{
-        srv.Listen(22);
-    }catch(QtSocket::SocketException& ex){
+        srv.listen(22);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EACCES );
     }
-    unsigned int port = srv.ListenPort();
+    unsigned int port = srv.listen_port();
     assert(port == 0);
-    srv.Close();
+    srv.close();
 
-    QtSocket::TCPServer srv2;
-    srv2.Listen(20000);
-    port = srv2.ListenPort();
+    comno::tcp_server srv2;
+    srv2.listen(20000);
+    port = srv2.listen_port();
     assert(port == 20000);
 
     try{
-        bool res = srv2.Listen(20000);
+        bool res = srv2.listen(20000);
         assert(res == true);
-    }catch(QtSocket::SocketException& ex){
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EINVAL );
     }
 
     try{
-        QtSocket::TCPServer srv3;
-        bool res = srv3.Listen(20000);
-    }catch(QtSocket::SocketException& ex){
+        comno::tcp_server srv3;
+        bool res = srv3.listen(20000);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == EADDRINUSE );
     }
-    srv2.Close();
+    srv2.close();
 }
 
 #include <thread>
@@ -172,24 +172,24 @@ void TestAccept()
     TEST_PROMPT(__FUNCTION__);
 
     std::thread listen_thread([]{
-        QtSocket::TCPServer srv;
-        srv.SetReuseAddr(true);
-        srv.Listen(20000);
+        comno::tcp_server srv;
+        srv.set_reuse_addr(true);
+        srv.listen(20000);
 
-        QtSocket::TCPClient client = srv.Accept();
-        assert(client.DestPort() == 20000);
-        assert(client.DestIP().empty());
+        comno::tcp_client client = srv.accept();
+        assert(client.dest_end_point().port == 20000);
+        assert(client.dest_end_point().ip.empty());
 
-        assert(client.SrcIP() == "127.0.0.1");
-        assert(client.SrcPort() == 0);
+        assert(client.src_end_point().ip == "127.0.0.1");
+        assert(client.src_end_point().port == 0);
     });
 
     std::thread client_thread([]{
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        EndPoint host("127.0.0.1", 20000);
-        QtSocket::TCPClient client;
-        client.Connect(host);
+        end_point host("127.0.0.1", 20000);
+        comno::tcp_client client;
+        client.connect(host);
     });
 
     if( listen_thread.joinable() )
@@ -202,18 +202,18 @@ void TestDomainListen()
     TEST_PROMPT(__FUNCTION__);
     const char* domain_path = "test_domain_file";
 
-    QtSocket::TCPDomainServer srv;
-    srv.Listen(domain_path);
+    comno::tcp_domain_server srv;
+    srv.listen(domain_path);
 }
 void TestDomainConnect()
 {
     TEST_PROMPT(__FUNCTION__);
     const char* domain_path = "test_domain_file";
 
-    QtSocket::TCPDomainClient client;
+    comno::tcp_domain_client client;
     try{
-        client.Connect(domain_path);
-    }catch(QtSocket::SocketException& ex){
+        client.connect(domain_path);
+    }catch(comno::socket_exception& ex){
         assert(ex.error_code() == ENOENT );
     }
 }
@@ -223,20 +223,20 @@ void TestDomainAccept()
     const char* domain_path = "test_domain_file";
 
     std::thread listen_thread([&domain_path]{
-        QtSocket::TCPDomainServer srv;
-        srv.Listen(domain_path);
+        comno::tcp_domain_server srv;
+        srv.listen(domain_path);
 
-        QtSocket::TCPDomainClient client = srv.Accept();
-        assert(client.FD() != 0);
-        assert(client.DomainFile() == domain_path);
+        comno::tcp_domain_client client = srv.accept();
+        assert(client.fd() != 0);
+        assert(client.domain_file() == domain_path);
     });
 
     std::thread client_thread([&domain_path]{
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        QtSocket::TCPDomainClient client;
-        client.Connect(domain_path);
-        assert(client.DomainFile() == domain_path);
+        comno::tcp_domain_client client;
+        client.connect(domain_path);
+        assert(client.domain_file() == domain_path);
     });
 
     if( listen_thread.joinable() )
