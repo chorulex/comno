@@ -38,7 +38,7 @@ bool TCPDomainClient::Connect(const std::string& domain_file)
 
     struct sockaddr_un serverAddr;
     if(domain_file.size() >= sizeof(serverAddr.sun_path))
-        throw SocketException(ENAVAIL);
+        throw SocketException(ErrorCode(ENAVAIL));
 
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sun_family = AF_UNIX;
@@ -47,7 +47,7 @@ bool TCPDomainClient::Connect(const std::string& domain_file)
     std::size_t len = offsetof(struct sockaddr_un, sun_path) + strlen(serverAddr.sun_path);
     int res = ::connect(_sock_fd, (struct sockaddr *)&serverAddr, len);
     if( res == -1 )
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
 
     _domain_file = domain_file;
     return true;

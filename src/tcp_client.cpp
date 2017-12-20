@@ -39,7 +39,7 @@ bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
     if ( _sock_fd == -1 ){
         _sock_fd = TCPSocket::CreateFD();
         if ( _sock_fd == -1 )
-            throw SocketException(errno);
+            throw SocketException(ErrorCode(errno));
     }
 
     sockaddr_in server_address;
@@ -48,14 +48,14 @@ bool TCPClient::Connect(const EndPoint& host, time_t timeout_sec)
     server_address.sin_port    = htons(host.port);
     if(inet_aton(host.ip.c_str(), &server_address.sin_addr) == 0){
         Close();
-        throw SocketException(EINVAL);
+        throw SocketException(ErrorCode(EINVAL));
     }
 
     // until to success or fail
     if( timeout_sec == 0 ){
         if (connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
             Close();
-            throw SocketException(errno);
+            throw SocketException(ErrorCode(errno));
             return false;
         }
     }else{
@@ -95,18 +95,18 @@ bool TCPClient::ConnectTimeout(time_t timeout_sec)
     int res = select(_sock_fd+1, NULL, &fset, NULL, &time_val);
     if( res <= 0 ){
         Close();
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
     }
 
     int error = -1;
     GetSockOpt(SOL_SOCKET, SO_ERROR, error);
     if( error != 0 ){
-        throw SocketException(error);
+        throw SocketException(ErrorCode(error));
     }else {
         if( errno == EINPROGRESS )
-            throw SocketException(ETIMEDOUT);
+            throw SocketException(ErrorCode(ETIMEDOUT));
         else
-            throw SocketException(errno);
+            throw SocketException(ErrorCode(errno));
     }
 
     return false;

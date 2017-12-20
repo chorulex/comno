@@ -49,35 +49,35 @@ void TestConnect()
         QtSocket::EndPoint host("192.168.2.186", 30000);
         socket.Connect(host);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == ECONNREFUSED );
+        assert(ex.error_code() == ECONNREFUSED );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.600", 20000); //no this host
         socket.Connect(host);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EINVAL );
+        assert(ex.error_code() == EINVAL );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.0", 20000); //no this host
         socket.Connect(host);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == ENETUNREACH );
+        assert(ex.error_code() == ENETUNREACH );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.16", 20000); //no this host
         socket.Connect(host);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EHOSTUNREACH );
+        assert(ex.error_code() == EHOSTUNREACH );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2", 20000); //no this host
         socket.Connect(host);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == ETIMEDOUT );
+        assert(ex.error_code() == ETIMEDOUT );
     }
 }
 
@@ -91,42 +91,42 @@ void TestConnectTimeout()
         QtSocket::EndPoint host("192.168.2.186", 20000);
         socket.Connect(host, 3);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == ECONNREFUSED );
+        assert(ex.error_code() == ECONNREFUSED );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.186", 20000);
         socket.Connect(host, 3);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == ECONNABORTED );
+        assert(ex.error_code() == ECONNABORTED );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.600", 20000); //no this host
         socket.Connect(host, 3);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EINVAL );
+        assert(ex.error_code() == EINVAL );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2", 20000); //no this host
         socket.Connect(host, 3);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EINPROGRESS );
+        assert(ex.error_code() == EINPROGRESS );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.0", 20000); //no this host
         socket.Connect(host, 3);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EALREADY );
+        assert(ex.error_code() == EALREADY );
     }
 
     try{
         QtSocket::EndPoint host("192.168.2.16", 20000); //no this host
         socket.Connect(host, 3);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EALREADY );
+        assert(ex.error_code() == EALREADY );
     }
 }
 
@@ -138,7 +138,7 @@ void TestListen()
     try{
         srv.Listen(22);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EACCES );
+        assert(ex.error_code() == EACCES );
     }
     unsigned int port = srv.ListenPort();
     assert(port == 0);
@@ -153,14 +153,14 @@ void TestListen()
         bool res = srv2.Listen(20000);
         assert(res == true);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EINVAL );
+        assert(ex.error_code() == EINVAL );
     }
 
     try{
         QtSocket::TCPServer srv3;
         bool res = srv3.Listen(20000);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == EADDRINUSE );
+        assert(ex.error_code() == EADDRINUSE );
     }
     srv2.Close();
 }
@@ -214,7 +214,7 @@ void TestDomainConnect()
     try{
         client.Connect(domain_path);
     }catch(QtSocket::SocketException& ex){
-        assert(ex.ErrorCode() == ENOENT );
+        assert(ex.error_code() == ENOENT );
     }
 }
 void TestDomainAccept()

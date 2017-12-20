@@ -110,7 +110,7 @@ int TCPSocket::Recv(char* buffer, int max_len)
 {
     int res = ::recv(_sock_fd, buffer, max_len, 0);
     if (res == -1 ) 
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
 
     //LOG_DEBUG(main_logger, "size:%d.", res);
     return res;
@@ -125,7 +125,7 @@ int TCPSocket::Send(const char* buffer, int size)
 {
     int res = QtSocket::Send(_sock_fd, buffer, size);
     if (res == -1 )
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
 
     //LOG_DEBUG(main_logger, "size:%d.", res);
     return res;

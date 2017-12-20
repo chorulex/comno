@@ -2,21 +2,22 @@
 #define _QT_SOCKET_EXCEPTION_H_
 
 #include <exception>
-#include <errno.h>
+#include "error_code.h"
 
 namespace QtSocket
 {
+
 class SocketException : public std::exception
 {
 public:
-    SocketException(int err);
-    int ErrorCode() const { return _errno;}
+    SocketException(const ErrorCode& err);
+    int error_code() const { return _errno.value();}
 
 public:
     virtual const char* what() const noexcept;
 
 private:
-    int _errno;
+    ErrorCode _errno;
 };
 
 }

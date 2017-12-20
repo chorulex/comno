@@ -29,7 +29,7 @@ bool TCPServer::Listen(const unsigned int port)
 
     int res = ::listen(_sock_fd, 10);
     if (res < 0) {
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
     }
 
     _listen_port = port;
@@ -46,7 +46,7 @@ void TCPServer::Bind(const unsigned int port)
 
     int res = ::bind(_sock_fd, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
     if( res == -1 )
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
 }
 
 void TCPServer::SetReuseAddr(bool use)
@@ -61,7 +61,7 @@ TCPClient TCPServer::Accept()
 
     int clientSocket = ::accept(_sock_fd, (struct sockaddr *)&clientAddr, &cliLen);
     if (clientSocket == -1 ) {
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
     }
 
     EndPoint dest, src;

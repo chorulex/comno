@@ -49,7 +49,7 @@ bool TCPDomainServer::Listen(const std::string& path)
 
     int res = ::listen(_sock_fd, 10);
     if (res < 0) 
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
 
     _domain_file = path;
     return true;
@@ -59,7 +59,7 @@ void TCPDomainServer::Bind(const std::string& path)
 {
     struct sockaddr_un serverAddr;
     if(path.size() >= sizeof(serverAddr.sun_path))
-        throw SocketException(ENAVAIL);
+        throw SocketException(ErrorCode(ENAVAIL));
 
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sun_family = AF_UNIX;
@@ -69,7 +69,7 @@ void TCPDomainServer::Bind(const std::string& path)
     std::size_t len = offsetof(struct sockaddr_un, sun_path) + strlen(serverAddr.sun_path);
     int res = ::bind(_sock_fd, (struct sockaddr *)&serverAddr, len);
     if( res == -1 )
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
 }
 
 TCPDomainClient TCPDomainServer::Accept() 
@@ -79,7 +79,7 @@ TCPDomainClient TCPDomainServer::Accept()
  
     int clientSocket = ::accept(_sock_fd, (sockaddr*)&clientAddr, &cliLen); 
     if (clientSocket == -1 )
-        throw SocketException(errno);
+        throw SocketException(ErrorCode(errno));
     
     return TCPDomainClient(clientSocket, _domain_file);
 }
