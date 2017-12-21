@@ -13,6 +13,17 @@
 namespace comno
 {
 
+std::string host_name()
+{
+    char name[1024];
+    if( gethostname(name, sizeof(name)-1) != 0 ){
+        throw socket_exception(error_code(errno));
+        return "";
+    }
+
+    return std::string(name);
+}
+
 void close(const socket_t sock_fd)
 {
     ::close(sock_fd);

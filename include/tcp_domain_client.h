@@ -5,6 +5,9 @@
 
 namespace comno
 {
+/**
+ * speciafilly for UNIX/Linux Domain sockets
+ */
 class tcp_domain_client : public tcp_socket
 {
 public:

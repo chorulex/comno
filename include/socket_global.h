@@ -7,6 +7,8 @@
 
 namespace comno
 {
+extern std::string host_name();
+
 extern void close(const socket_t sock_fd);
 
 extern void set_block(const socket_t sock_fd, bool blocked);

@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <cstdio>
 #include <cstring>
 #include <cassert>
@@ -19,6 +20,16 @@ using namespace comno;
 const char* PROMPT_STR = ">> ";
 #define TEST_PROMPT(func) printf("[%s] --- RUNNING\n", func);
 #define ERR_PROMPT() printf("line:%d, error:%s.\n", __LINE__, ex.what());
+
+void TestHostname()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    char name[1024];
+    gethostname(name, 1024);
+
+    assert(comno::host_name() == name);
+}
 
 void TestSockOpt()
 {
@@ -247,6 +258,8 @@ void TestDomainAccept()
 
 int main(int argc, char* argv[])
 {
+    TestHostname();
+
     TestSockOpt();
     TestAccept();
 

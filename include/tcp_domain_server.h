@@ -11,6 +11,8 @@
 namespace comno
 {
 /**
+ * speciafilly for UNIX/Linux Domain sockets
+ *
  * AF_UNIX | SOCK_STREAM | IPPROTO_TCP
  */
 class tcp_domain_server : public tcp_socket
