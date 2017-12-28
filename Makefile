@@ -1,6 +1,6 @@
 PROGRAMS	:= qt_socket_test
 CXX 		:= g++
-CXXFLAGS	:= -std=c++11 -Wall -g -I./include
+CXXFLAGS	:= -std=c++11 -Wall -g -I./src
 LDFLAGS		:= -Wall -g
 LDLIBS = -lpthread
 SLIBS=

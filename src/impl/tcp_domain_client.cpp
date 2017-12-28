@@ -16,6 +16,14 @@ tcp_domain_client::tcp_domain_client() noexcept
 {
     _sock_fd = create_fd();
 }
+tcp_domain_client::tcp_domain_client(tcp_domain_client&& src) noexcept
+{
+    this->_sock_fd = src._sock_fd;
+    src._sock_fd = 0;
+
+    this->_domain_file = src._domain_file;
+    src._domain_file.clear();
+}
 tcp_domain_client::tcp_domain_client(const socket_t sock_fd, const std::string& domain_file) noexcept
 {
     _sock_fd = sock_fd;

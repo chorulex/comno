@@ -1,17 +1,20 @@
 #ifndef _COMNO_TCP_CLIENT_SOCKET_H_
 #define _COMNO_TCP_CLIENT_SOCKET_H_
 
+#include "utility/noncopyable.h"
 #include "end_point.h"
 #include "socket.h"
 
 namespace comno
 {
-class tcp_client : public tcp_socket
+class tcp_client : public tcp_socket, public noncopyable
 {
 public:
     tcp_client() noexcept;
-    tcp_client(const socket_t sock_fd)noexcept;
-    tcp_client(const socket_t sock_fd, const end_point& src, const end_point& dest) noexcept;
+    explicit tcp_client(const socket_t sock_fd) noexcept;
+    explicit tcp_client(const socket_t sock_fd, const end_point& src, const end_point& dest) noexcept;
+    tcp_client(tcp_client&&) noexcept;
+    tcp_client& operator= (tcp_client&&) noexcept;
 
     /**
      * not close socket fd on this calling.

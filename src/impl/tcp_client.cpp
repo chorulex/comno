@@ -15,6 +15,26 @@ tcp_client::tcp_client()noexcept
 {
     _sock_fd = tcp_socket::create_fd();
 }
+
+tcp_client::tcp_client(tcp_client&& src) noexcept
+{
+    this->_sock_fd = src._sock_fd;
+    src._sock_fd = 0;
+
+    this->_dest_end_point = src._dest_end_point;
+    this->_src_end_point = src._src_end_point;
+}
+
+tcp_client& tcp_client::operator= (tcp_client&& src) noexcept
+{
+    this->_sock_fd = src._sock_fd;
+    src._sock_fd = 0;
+
+    this->_dest_end_point = src._dest_end_point;
+    this->_src_end_point = src._src_end_point;
+
+    return *this;
+}
 tcp_client::tcp_client(const socket_t sock_fd)noexcept
 {
     _sock_fd = sock_fd;
