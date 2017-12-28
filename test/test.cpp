@@ -9,11 +9,7 @@
 #include <vector>
 #include <iostream>
 
-#include "socket_exception.h"
-#include "tcp_client.h"
-#include "tcp_server.h"
-#include "tcp_domain_client.h"
-#include "tcp_domain_server.h"
+#include "comno/socket.h"
 
 using namespace comno;
 
@@ -37,10 +33,22 @@ void TestSockOpt()
 
     comno::tcp_client client;
 
-    int rec_buff_size = 2048;
-    client.set_sock_opt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
-    client.get_sock_opt(SOL_SOCKET, SO_RCVBUF, rec_buff_size);
-    assert( rec_buff_size > 0 );
+    const int rec_buff_size = 2048;
+
+    comno::option::integer_t<SOL_SOCKET, SO_RCVBUF> opt(rec_buff_size);
+    assert( opt.level() == SOL_SOCKET);
+    assert( opt.name() == SO_RCVBUF);
+    assert( opt.size() == sizeof(int) );
+    assert( opt.data() );
+    assert( opt.value() == rec_buff_size );
+
+    client.set_option(opt);
+    assert( opt.value() == rec_buff_size );
+    assert( opt.value() != 0 );
+
+    client.get_option(opt);
+    assert( opt.value() != rec_buff_size );
+    assert( opt.value() != 0 );
 
     time_t timeout = 3;
     client.set_recv_timeout(timeout);
@@ -184,7 +192,10 @@ void TestAccept()
 
     std::thread listen_thread([]{
         comno::tcp_server srv;
-        srv.set_reuse_addr(true);
+
+        comno::socket_base::reuse_address opt(true);
+        srv.set_option(opt);
+
         srv.listen(20000);
 
         comno::tcp_client client = srv.accept();

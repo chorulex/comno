@@ -1,9 +1,8 @@
 #ifndef _COMNO_TCP_DOMAIN_CLIENT_SOCKET_H_
 #define _COMNO_TCP_DOMAIN_CLIENT_SOCKET_H_
 
-#include "utility/noncopyable.h"
-
-#include "socket.h"
+#include "comno/utility/noncopyable.h"
+#include "socket_base.h"
 
 namespace comno
 {

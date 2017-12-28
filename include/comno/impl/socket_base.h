@@ -1,21 +1,25 @@
-#ifndef _COMNO_SOCKET_H_
-#define _COMNO_SOCKET_H_
+#ifndef _COMNO_SOCKET_BASE_H_
+#define _COMNO_SOCKET_BASE_H_
 
 #include <string>
 #include <sys/socket.h>
 
+#include "comno/option/socket_option_ops.h"
+#include "socket_exception.h"
 #include "socket_t.h"
 #include "socket_global.h"
 
 namespace comno
 {
-class socket
+class socket_base
 {
 protected:
-    socket() = default;
+    socket_base() = default;
 
 public:
-    virtual ~socket() = default;
+    using reuse_address = option::boolean_t<SOL_SOCKET, SO_REUSEADDR>;
+
+    virtual ~socket_base() = default;
 
 public:
     virtual void close();
@@ -24,15 +28,22 @@ public:
     void set_no_block();
     void set_block();
 
-    void set_sock_opt(int level, int opt_name, const unsigned char opt_val);
-    void set_sock_opt(int level, int opt_name, const int opt_val);
-    void set_sock_opt(int level, int opt_name, const unsigned int opt_val);
-    void set_sock_opt(int level, int opt_name, const struct timeval &opt_val);
-
-    void get_sock_opt(int level, int opt_name, unsigned char &opt_val);
-    void get_sock_opt(int level, int opt_name, int& opt_val);
-    void get_sock_opt(int level, int opt_name, unsigned int &opt_val);
-    void get_sock_opt(int level, int opt_name, struct timeval &opt_val);
+    template<typename option_t>
+    void set_option(const option_t& opt)
+    {
+        error_code ec;
+        option::setsockopt(_sock_fd, opt, ec);
+        if( ec != 0 )
+            throw socket_exception(ec);
+    }
+    template<typename option_t>
+    void get_option(option_t& opt)
+    {
+        error_code ec;
+        option::getsockopt(_sock_fd, opt, ec);
+        if( ec != 0 )
+            throw socket_exception(ec);
+    }
 
 protected:
     virtual int create_fd() = 0;
@@ -41,7 +52,7 @@ protected:
     socket_t _sock_fd;
 };
 
-class tcp_socket : public socket
+class tcp_socket : public socket_base
 {
 protected:
     tcp_socket() = default;

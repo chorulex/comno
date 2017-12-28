@@ -49,11 +49,6 @@ void tcp_server::bind(const unsigned int port)
         throw socket_exception(error_code(errno));
 }
 
-void tcp_server::set_reuse_addr(bool use)
-{
-    set_sock_opt(SOL_SOCKET, SO_REUSEADDR, use ? 1 : 0);
-}
-
 tcp_client tcp_server::accept()
 {
     struct sockaddr_in clientAddr;

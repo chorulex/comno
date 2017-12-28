@@ -1,6 +1,6 @@
 PROGRAMS	:= qt_socket_test
 CXX 		:= g++
-CXXFLAGS	:= -std=c++11 -Wall -g -I./src
+CXXFLAGS	:= -std=c++11 -Wall -g -I./include
 LDFLAGS		:= -Wall -g
 LDLIBS = -lpthread
 SLIBS=
@@ -12,6 +12,7 @@ SLIBS=
 SRC := $(wildcard *.cpp)
 SRC += $(wildcard */*.cpp)
 SRC += $(wildcard */*/*.cpp)
+SRC += $(wildcard */*/*/*.cpp)
 
 #list of all soruce code directories
 SRC_DIR := $(sort $(dir $(SRC)))
@@ -19,6 +20,7 @@ SRC_DIR := $(sort $(dir $(SRC)))
 INC := $(wildcard *.h)
 INC += $(wildcard */*.h)
 INC += $(wildcard */*/*.h)
+INC += $(wildcard */*/*/*.h)
 INC := $(sort $(dir $(INC)))
 #INCLUDE_DIR := $(foreach n, $(INC))
 

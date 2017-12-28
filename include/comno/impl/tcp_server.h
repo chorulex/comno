@@ -4,7 +4,7 @@
 #include <string>
 
 #include "end_point.h"
-#include "socket.h"
+#include "socket_base.h"
 #include "tcp_client.h"
 #include "socket_exception.h"
 
@@ -21,7 +21,6 @@ public:
     ~tcp_server();
 
 public:
-    void set_reuse_addr(bool use);
     bool listen(const unsigned int port);
     tcp_client accept();
 

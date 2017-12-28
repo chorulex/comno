@@ -2,3 +2,4 @@ bin/
 *.log*
 *.{0,out,a}
 qt_socket_test
+test

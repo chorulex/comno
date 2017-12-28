@@ -118,15 +118,16 @@ bool tcp_client::connect_timeout(time_t timeout_sec)
         throw socket_exception(error_code(errno));
     }
 
-    int error = -1;
-    get_sock_opt(SOL_SOCKET, SO_ERROR, error);
-    if( error != 0 ){
-        throw socket_exception(error_code(error));
+    error_code ec;
+    option::integer_t<SOL_SOCKET, SO_ERROR> opt;
+    option::getsockopt(_sock_fd, opt, ec);
+    if( opt != 0 ){
+        throw socket_exception(error_code(opt));
     }else {
-        if( errno == EINPROGRESS )
+        if( ec == EINPROGRESS )
             throw socket_exception(error_code(ETIMEDOUT));
         else
-            throw socket_exception(error_code(errno));
+            throw socket_exception(ec);
     }
 
     return false;

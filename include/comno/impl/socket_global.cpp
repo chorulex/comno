@@ -48,16 +48,4 @@ int send(const socket_t sock_fd, const std::string& buffer)
 {
     return send(sock_fd, buffer.c_str(), buffer.size());
 }
-
-void set_sock_opt(const socket_t sock_fd, int level, int opt_name, const void* opt_val, socklen_t opt_len)
-{
-    if( -1 == ::setsockopt(sock_fd, level, opt_name, opt_val, opt_len) )
-        throw socket_exception(error_code(errno));
-}
-
-void get_sock_opt(const socket_t sock_fd, int level, int opt_name, void* opt_val, socklen_t* opt_len)
-{
-    if( -1 == ::getsockopt(sock_fd, level, opt_name, opt_val, opt_len) )
-        throw socket_exception(error_code(errno));
-}
 }

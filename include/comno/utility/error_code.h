@@ -8,11 +8,17 @@ namespace comno
 class error_code
 {
 public:
+    error_code() :_errno(0){}
     explicit error_code(int err) : _errno (err){}
     error_code(const error_code& src) : _errno(src._errno){}
     error_code& operator= (const error_code& src)
     {
         _errno = src._errno;
+        return *this;
+    }
+    error_code& operator= (const int ec)
+    {
+        _errno = ec;
         return *this;
     }
 
