@@ -17,7 +17,7 @@ std::string host_name()
 {
     char name[1024];
     if( gethostname(name, sizeof(name)-1) != 0 ){
-        throw socket_exception(error_code(errno));
+        throw socket_exception(system::error_code(errno));
         return "";
     }
 
@@ -38,7 +38,7 @@ int send(const socket_t sock_fd, const char* buffer, int size)
 {
     int res = ::send(sock_fd, buffer, size, MSG_NOSIGNAL);
     if (res == -1 )
-        throw socket_exception(error_code(errno));
+        throw socket_exception(system::error_code(errno));
 
     //LOG_DEBUG(main_logger, "size:%d.", res);
     return res;

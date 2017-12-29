@@ -4,7 +4,7 @@
 #include <string>
 
 #include "end_point.h"
-#include "socket_base.h"
+#include "tcp_socket.h"
 #include "tcp_client.h"
 #include "socket_exception.h"
 

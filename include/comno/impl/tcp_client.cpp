@@ -1,11 +1,5 @@
 #include <cstring>
 
-#include <unistd.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-
 #include "tcp_client.h"
 #include "socket_exception.h"
 
@@ -59,7 +53,7 @@ bool tcp_client::connect(const end_point& host, time_t timeout_sec)
     if ( _sock_fd == -1 ){
         _sock_fd = tcp_socket::create_fd();
         if ( _sock_fd == -1 )
-            throw socket_exception(error_code(errno));
+            throw socket_exception(system::error_code(errno));
     }
 
     sockaddr_in server_address;
@@ -68,14 +62,14 @@ bool tcp_client::connect(const end_point& host, time_t timeout_sec)
     server_address.sin_port    = htons(host.port);
     if(inet_aton(host.ip.c_str(), &server_address.sin_addr) == 0){
         close();
-        throw socket_exception(error_code(EINVAL));
+        throw socket_exception(system::error_code(EINVAL));
     }
 
     // until to success or fail
     if( timeout_sec == 0 ){
         if (::connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address)) == -1) {
             close();
-            throw socket_exception(error_code(errno));
+            throw socket_exception(system::error_code(errno));
             return false;
         }
     }else{
@@ -115,17 +109,17 @@ bool tcp_client::connect_timeout(time_t timeout_sec)
     int res = select(_sock_fd+1, NULL, &fset, NULL, &time_val);
     if( res <= 0 ){
         close();
-        throw socket_exception(error_code(errno));
+        throw socket_exception(system::error_code(errno));
     }
 
-    error_code ec;
+    system::error_code ec;
     option::integer_t<SOL_SOCKET, SO_ERROR> opt;
     option::getsockopt(_sock_fd, opt, ec);
     if( opt != 0 ){
-        throw socket_exception(error_code(opt));
+        throw socket_exception(system::error_code(opt));
     }else {
         if( ec == EINPROGRESS )
-            throw socket_exception(error_code(ETIMEDOUT));
+            throw socket_exception(system::error_code(ETIMEDOUT));
         else
             throw socket_exception(ec);
     }

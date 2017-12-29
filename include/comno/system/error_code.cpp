@@ -5,6 +5,8 @@
 
 namespace comno
 {
+namespace system
+{
 #define __error_code_name__(errno) case errno: return #errno;
 
 const char* error_code::to_string() const
@@ -152,5 +154,6 @@ const char* error_code::to_string() const
 const char* error_code::details() const
 {
     return ::strerror(_errno);
+}
 }
 }

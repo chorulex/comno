@@ -29,7 +29,7 @@ bool tcp_server::listen(const unsigned int port)
 
     int res = ::listen(_sock_fd, 10);
     if (res < 0) {
-        throw socket_exception(error_code(errno));
+        throw socket_exception(system::error_code(errno));
     }
 
     _listen_port = port;
@@ -46,7 +46,7 @@ void tcp_server::bind(const unsigned int port)
 
     int res = ::bind(_sock_fd, (struct sockaddr *)&serverAddr, sizeof(serverAddr));
     if( res == -1 )
-        throw socket_exception(error_code(errno));
+        throw socket_exception(system::error_code(errno));
 }
 
 tcp_client tcp_server::accept()
@@ -56,7 +56,7 @@ tcp_client tcp_server::accept()
 
     int clientSocket = ::accept(_sock_fd, (struct sockaddr *)&clientAddr, &cliLen);
     if (clientSocket == -1 ) {
-        throw socket_exception(error_code(errno));
+        throw socket_exception(system::error_code(errno));
     }
 
     end_point dest, src;

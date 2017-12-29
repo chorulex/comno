@@ -3,6 +3,7 @@
 
 #include "option/socket_option_ops.h"
 #include "impl/socket_exception.h"
+#include "impl/tcp_socket.h"
 #include "impl/tcp_client.h"
 #include "impl/tcp_server.h"
 #include "impl/tcp_domain_client.h"

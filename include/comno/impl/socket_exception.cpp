@@ -5,7 +5,7 @@
 namespace comno
 {
 
-socket_exception::socket_exception(const comno::error_code& err) : _errno(err.value())
+socket_exception::socket_exception(const system::error_code& err) : _errno(err.value())
 {
 }
 
