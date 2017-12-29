@@ -63,7 +63,7 @@ tcp_client tcp_server::accept()
     dest.port = listen_port();
     src.ip = ::inet_ntoa(clientAddr.sin_addr);
 
-    return tcp_client(clientSocket, src, dest);
+    return tcp_client(socket_t(clientSocket), src, dest);
 }
 
 }

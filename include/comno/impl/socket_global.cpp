@@ -31,7 +31,7 @@ void close(const socket_t sock_fd)
 
 void set_block(const socket_t sock_fd, bool blocked)
 {
-    ::ioctl(sock_fd, FIONBIO, blocked ? 1 : 0);
+    ::ioctl(sock_fd, FIONBIO, blocked ? 0 : 1);
 }
 
 int send(const socket_t sock_fd, const char* buffer, int size)

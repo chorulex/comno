@@ -11,10 +11,48 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
-
 namespace comno
 {
-using socket_t = int;
+class socket_t
+{
+    using socket_fd_type = int;
+
+public:
+    socket_t() : _fd(0)
+    {
+    }
+    socket_t(const socket_t& src) : _fd(src._fd)
+    {
+    }
+    explicit socket_t(socket_fd_type fd) : _fd(fd)
+    {
+    }
+    socket_t& operator= (const socket_t& src)
+    {
+        _fd = src._fd;
+        return *this;
+    }
+    socket_t& operator= (const socket_fd_type& src)
+    {
+        _fd = src;
+        return *this;
+    }
+
+public:
+    operator int() const
+    {
+        return _fd;
+    }
+
+    bool illegal()
+    {
+        return _fd <= 0;
+    }
+
+private:
+    socket_fd_type _fd;
+};
+
 }
 
 #endif

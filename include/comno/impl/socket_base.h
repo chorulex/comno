@@ -24,8 +24,7 @@ public:
     virtual void close();
     socket_t fd() const { return _sock_fd;}
 
-    void set_no_block();
-    void set_block();
+    void block(bool val);
 
     template<typename option_t>
     void set_option(const option_t& opt)

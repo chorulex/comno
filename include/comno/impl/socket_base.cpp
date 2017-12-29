@@ -6,14 +6,9 @@
 namespace comno
 {
 
-void socket_base::set_no_block()
+void socket_base::block(bool val)
 {
-    comno::set_block(_sock_fd, true);
-}
-
-void socket_base::set_block()
-{
-    comno::set_block(_sock_fd, false);
+    comno::set_block(_sock_fd, val);
 }
 
 void socket_base::close()

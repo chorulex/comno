@@ -81,6 +81,6 @@ tcp_domain_client tcp_domain_server::accept()
     if (clientSocket == -1 )
         throw socket_exception(system::error_code(errno));
     
-    return tcp_domain_client(clientSocket, _domain_file);
+    return tcp_domain_client(socket_t(clientSocket), _domain_file);
 }
 }

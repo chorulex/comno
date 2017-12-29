@@ -73,7 +73,7 @@ bool tcp_client::connect(const end_point& host, time_t timeout_sec)
             return false;
         }
     }else{
-        set_no_block();
+        block(false);
         int ret = ::connect(_sock_fd, (sockaddr*)&server_address, sizeof(server_address));
         if( ret == -1 ){
             try{
@@ -84,7 +84,7 @@ bool tcp_client::connect(const end_point& host, time_t timeout_sec)
             }
         }
 
-        set_block();
+        block(true);
     }
 
     _dest_end_point = host;
