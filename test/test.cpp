@@ -1,15 +1,21 @@
 #include <unistd.h>
-#include <cstdio>
-#include <cstring>
-#include <cassert>
 #include <errno.h>
 #include <sys/signal.h>
+#include <cstdio>
+#include <cstring>
 
+#include <type_traits>
 #include <string>
 #include <vector>
 #include <iostream>
 
+#include "comno_assert.h"
+
 #include "comno/socket.h"
+#include "tcp_client.h"
+#include "tcp_server.h"
+#include "tcp_domain_client.h"
+#include "tcp_domain_server.h"
 
 using namespace comno;
 
@@ -17,6 +23,53 @@ const char* PROMPT_STR = ">> ";
 #define TEST_PROMPT(func) printf("[%s] --- RUNNING\n", func);
 #define ERR_PROMPT() printf("line:%d, error:%s.\n", __LINE__, ex.what());
 
+static const char* domain_file = "test_domain_file";
+
+void TestIPEndpoint()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    const char* ip = "127.0.0.1";
+    const unsigned port = 20000;
+
+    comno::address_v4 addr = comno::address_v4::from_string(ip);
+
+    comno::tcp::endpoint ep1(addr, 20000);
+    EQUAL(ep1.address().to_string(), ip);
+    EQUAL(ep1.port(), port);
+
+    ep1.port(3000);
+    EQUAL(ep1.port(), 3000);
+
+    comno::tcp::endpoint ep2(addr.to_uint(), 20000);
+    EQUAL(ep2.address().to_string(), ip);
+    EQUAL(ep2.port(), port);
+
+    comno::address_v4 addr1 = comno::address_v4::from_string("0.0.0.0");
+    ep2.address(addr1);
+    EQUAL(ep2.address().to_string(), "0.0.0.0");
+
+    ep2.address(addr1.to_uint());
+    EQUAL(ep2.address().to_string(), "0.0.0.0");
+}
+
+void TestNetAddress()
+{
+    TEST_PROMPT(__FUNCTION__);
+    comno::address_v4 addr;
+    
+    const char* ip = "127.0.0.1";
+    comno::address_v4 addr_from_str = comno::address_v4::from_string(ip);
+    comno::address_v4 addr_from_str_1 = comno::address_v4::from_string(std::string(ip));
+    comno::address_v4 addr_default = comno::address_v4::any();
+}
+void TestCreateTCPSocket()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    //comno::io_server io_srv;
+    
+}
 void TestHostname()
 {
     TEST_PROMPT(__FUNCTION__);
@@ -24,79 +77,85 @@ void TestHostname()
     char name[1024];
     gethostname(name, 1024);
 
-    assert(comno::host_name() == name);
+    EQUAL(comno::host_name() , name);
 }
 
 void TestSockOpt()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    comno::tcp_client client;
-
     const int rec_buff_size = 2048;
 
     comno::option::integer_t<SOL_SOCKET, SO_RCVBUF> opt(rec_buff_size);
-    assert( opt.level() == SOL_SOCKET);
-    assert( opt.name() == SO_RCVBUF);
-    assert( opt.size() == sizeof(int) );
-    assert( opt.data() );
-    assert( opt.value() == rec_buff_size );
+    EQUAL( opt.level() , SOL_SOCKET);
+    EQUAL( opt.name() , SO_RCVBUF);
+    EQUAL( opt.size() , sizeof(int) );
+    NOT_NULL_POINTER( opt.data());
+    EQUAL( opt.value() , rec_buff_size );
 
-    client.set_option(opt);
-    assert( opt.value() == rec_buff_size );
-    assert( opt.value() != 0 );
+    comno::tcp::socket sock;
+    sock.set_option(opt);
+    EQUAL( opt.value() , rec_buff_size );
+    NOT_EQUAL( opt.value() , 0 );
 
-    client.get_option(opt);
-    assert( opt.value() != rec_buff_size );
-    assert( opt.value() != 0 );
+    sock.get_option(opt);
+    NOT_EQUAL( opt.value() , rec_buff_size );
+    NOT_EQUAL( opt.value() , 0 );
+}
+
+void TestTCPSockTimeout()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    tcp_client client;
 
     time_t timeout = 3;
     client.set_recv_timeout(timeout);
-    assert( client.get_recv_timeout() == timeout );
+    EQUAL( client.get_recv_timeout() , timeout );
 
     client.set_send_timeout(timeout);
-    assert( client.get_send_timeout() == timeout );
+    EQUAL( client.get_send_timeout() , timeout );
 }
 
 void TestConnect()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    comno::tcp_client socket;
+    tcp_client socket;
 
     try{
-        comno::end_point host("192.168.2.186", 30000);
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.186"), 30000);
         socket.connect(host);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == ECONNREFUSED );
+        EQUAL(ex.error_code() , ECONNREFUSED );
     }
 
     try{
-        comno::end_point host("192.168.2.600", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.600"), 30000);
         socket.connect(host);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EINVAL );
+        EQUAL(ex.error_code() , EINVAL );
     }
 
     try{
-        comno::end_point host("192.168.2.0", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.0"), 20000); //no this host
         socket.connect(host);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == ENETUNREACH );
+        EQUAL(ex.error_code() , ENETUNREACH );
     }
 
     try{
-        comno::end_point host("192.168.2.16", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.16"), 20000); //no this host
         socket.connect(host);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EHOSTUNREACH );
+        EQUAL(ex.error_code() , EHOSTUNREACH );
     }
 
     try{
-        comno::end_point host("192.168.2", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2"), 20000); //no this host
         socket.connect(host);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == ETIMEDOUT );
+        EQUAL(ex.error_code() , ETIMEDOUT );
     }
 }
 
@@ -104,82 +163,86 @@ void TestConnectTimeout()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    comno::tcp_client socket;
+    tcp_client socket;
 
     try{
-        comno::end_point host("192.168.2.186", 20000);
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.186"), 20000);
         socket.connect(host, 3);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == ECONNREFUSED );
+        EQUAL(ex.error_code() , ECONNREFUSED );
     }
 
     try{
-        comno::end_point host("192.168.2.186", 20000);
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.186"), 20000);
         socket.connect(host, 3);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == ECONNABORTED );
+        EQUAL(ex.error_code() , ECONNABORTED );
     }
 
     try{
-        comno::end_point host("192.168.2.600", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.600"), 20000); //no this host
         socket.connect(host, 3);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EINVAL );
+        EQUAL(ex.error_code() , EINVAL );
     }
 
     try{
-        comno::end_point host("192.168.2", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.2"), 20000); //no this host
         socket.connect(host, 3);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EINPROGRESS );
+        EQUAL(ex.error_code() , EINPROGRESS );
     }
 
     try{
-        comno::end_point host("192.168.2.0", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.0"), 20000); //no this host
         socket.connect(host, 3);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EALREADY );
+        EQUAL(ex.error_code() , EALREADY );
     }
 
     try{
-        comno::end_point host("192.168.2.16", 20000); //no this host
+        comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.16"), 20000); //no this host
         socket.connect(host, 3);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EALREADY );
+        EQUAL(ex.error_code() , EALREADY );
     }
 }
 
 void TestListen()
 {
     TEST_PROMPT(__FUNCTION__);
-    comno::tcp_server srv;
+    tcp_server srv;
+
+    EQUAL( srv.is_open(), true);
 
     try{
         srv.listen(22);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EACCES );
+        EQUAL(ex.error_code() , EACCES );
     }
     unsigned int port = srv.listen_port();
-    assert(port == 0);
+    EQUAL(port , 0);
     srv.close();
 
-    comno::tcp_server srv2;
+    EQUAL( srv.is_open(), false );
+
+    tcp_server srv2;
     srv2.listen(20000);
     port = srv2.listen_port();
-    assert(port == 20000);
+    EQUAL(port , 20000);
 
     try{
         bool res = srv2.listen(20000);
-        assert(res == true);
+        EQUAL(res , true);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EINVAL );
+        EQUAL(ex.error_code() , EINVAL );
     }
 
     try{
-        comno::tcp_server srv3;
+        tcp_server srv3;
         bool res = srv3.listen(20000);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == EADDRINUSE );
+        EQUAL(ex.error_code() , EADDRINUSE );
     }
     srv2.close();
 }
@@ -191,26 +254,28 @@ void TestAccept()
     TEST_PROMPT(__FUNCTION__);
 
     std::thread listen_thread([]{
-        comno::tcp_server srv;
-
-        comno::socket_base::reuse_address opt(true);
-        srv.set_option(opt);
+        tcp_server srv;
+        srv.reuse_address(true);
 
         srv.listen(20000);
+        EQUAL(srv.local_endpoint().port() , 20000);
+        EQUAL(srv.local_endpoint().address().to_string() , "0.0.0.0");
 
-        comno::tcp_client client = srv.accept();
-        assert(client.dest_end_point().port == 20000);
-        assert(client.dest_end_point().ip.empty());
+        tcp_client client = srv.accept();
+        NOT_EQUAL(client.remote_endpoint().port() , 0);
+        EQUAL(client.remote_endpoint().address().to_string() , "127.0.0.1");
+        NOT_EQUAL(client.remote_endpoint().address() , comno::address_v4());
 
-        assert(client.src_end_point().ip == "127.0.0.1");
-        assert(client.src_end_point().port == 0);
+        EQUAL(client.local_endpoint().port() , 20000);
+        EQUAL(client.local_endpoint().address().to_string() , "0.0.0.0");
+        EQUAL(client.local_endpoint().address() , comno::address_v4());
     });
 
     std::thread client_thread([]{
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        end_point host("127.0.0.1", 20000);
-        comno::tcp_client client;
+        comno::tcp::endpoint host(comno::address_v4::from_string("127.0.0.1"), 20000);
+        tcp_client client;
         client.connect(host);
     });
 
@@ -219,46 +284,65 @@ void TestAccept()
     if( client_thread.joinable() )
         client_thread.join();
 }
+
+void TestDomainSocket()
+{
+    TEST_PROMPT(__FUNCTION__);
+    comno::domain::stream_protocol::socket sk;
+
+    sk.open();
+    EQUAL(sk.is_open(), true);
+
+    sk.close();
+    EQUAL(sk.is_open(), false);
+
+    sk.open();
+    EQUAL(sk.is_open(), true);
+    sk.close();
+}
+
 void TestDomainListen()
 {
     TEST_PROMPT(__FUNCTION__);
-    const char* domain_path = "test_domain_file";
 
-    comno::tcp_domain_server srv;
-    srv.listen(domain_path);
+    tcp_domain_server srv;
+
+    try{
+        srv.listen(domain_file);
+    }catch(comno::socket_exception& ex){
+        NOT_EQUAL(ex.error_code(), EADDRINUSE);
+    }
 }
+
 void TestDomainConnect()
 {
     TEST_PROMPT(__FUNCTION__);
-    const char* domain_path = "test_domain_file";
 
-    comno::tcp_domain_client client;
+    tcp_domain_client client;
     try{
-        client.connect(domain_path);
+        client.connect(domain_file);
     }catch(comno::socket_exception& ex){
-        assert(ex.error_code() == ENOENT );
+        EQUAL(ex.error_code() , ENOENT );
     }
 }
 void TestDomainAccept()
 {
     TEST_PROMPT(__FUNCTION__);
-    const char* domain_path = "test_domain_file";
 
-    std::thread listen_thread([&domain_path]{
-        comno::tcp_domain_server srv;
-        srv.listen(domain_path);
+    std::thread listen_thread([]{
+        tcp_domain_server srv;
+        srv.listen(domain_file);
 
-        comno::tcp_domain_client client = srv.accept();
-        assert(client.fd() != 0);
-        assert(client.domain_file() == domain_path);
+        tcp_domain_client client = srv.accept();
+        EQUAL(client.domain_file() , domain_file);
     });
 
-    std::thread client_thread([&domain_path]{
+    std::thread client_thread([]{
         std::this_thread::sleep_for(std::chrono::seconds(2));
 
-        comno::tcp_domain_client client;
-        client.connect(domain_path);
-        assert(client.domain_file() == domain_path);
+        tcp_domain_client client;
+        client.connect(domain_file);
+        EQUAL(client.domain_file() , domain_file);
     });
 
     if( listen_thread.joinable() )
@@ -269,11 +353,15 @@ void TestDomainAccept()
 
 int main(int argc, char* argv[])
 {
+    TestNetAddress();
+    TestIPEndpoint();
     TestHostname();
-
+    TestCreateTCPSocket();
     TestSockOpt();
+    TestTCPSockTimeout();
     TestAccept();
 
+    TestDomainSocket();
     TestDomainListen();
     TestDomainConnect();
     TestDomainAccept();

@@ -1,12 +1,24 @@
 #ifndef _COMNO_SOCKET_H_
 #define _COMNO_SOCKET_H_
 
-#include "option/socket_option_ops.h"
-#include "impl/socket_exception.h"
-#include "impl/tcp_socket.h"
-#include "impl/tcp_client.h"
-#include "impl/tcp_server.h"
-#include "impl/tcp_domain_client.h"
-#include "impl/tcp_domain_server.h"
+#include "comno/utility/noncopyable.h"
+
+#include "comno/impl/socket_global.h"
+
+#include "comno/impl/ip/endpoint.h"
+#include "comno/impl/domain/endpoint.h"
+
+#include "comno/impl/socket_t.h"
+#include "comno/option/socket_option_ops.h"
+#include "comno/impl/socket_exception.h"
+#include "comno/impl/basic_socket.h"
+#include "comno/impl/address_v4.h"
+
+
+#include "comno/impl/acceptor.h"
+#include "comno/impl/domain.h"
+#include "comno/impl/tcp.h"
+
+//
 
 #endif

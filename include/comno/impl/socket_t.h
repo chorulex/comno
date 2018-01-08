@@ -44,7 +44,12 @@ public:
         return _fd;
     }
 
-    bool illegal()
+    void reset()
+    {
+        _fd = 0;
+    }
+
+    bool illegal() const
     {
         return _fd <= 0;
     }

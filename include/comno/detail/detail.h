@@ -3,11 +3,14 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 
 namespace comno
 {
-namespace details
+namespace detail
 {
+    // network byte order address.
+    using in_v4_addr_t = in_addr_t;
 }
 }
 #endif
