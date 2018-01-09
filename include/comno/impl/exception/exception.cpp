@@ -1,15 +1,15 @@
 #include <string>
 
-#include "socket_exception.h"
+#include "exception.h"
 
 namespace comno
 {
 
-socket_exception::socket_exception(const system::error_code& err) : _errno(err.value())
+exception::exception(const system::error_code& err) : _errno(err.value())
 {
 }
 
-const char* socket_exception::what() const noexcept
+const char* exception::what() const noexcept
 {
     std::string err("socket error: ");
     err.append(_errno.to_string());

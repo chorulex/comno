@@ -26,7 +26,7 @@ bool tcp_domain_client::connect(const std::string& domain_file)
         _socket.connect(comno::domain::stream_protocol::endpoint(domain_file));
         return true;
     }
-    catch( comno::socket_exception& ex){
+    catch( comno::exception& ex){
         return false;
     }
 }

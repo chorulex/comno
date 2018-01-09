@@ -2,16 +2,16 @@
 #define _COMNO_BASIC_SOCKET_H_
 
 #include <string>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 
 #include "comno/utility/noncopyable.h"
 #include "comno/option/socket_option_ops.h"
 #include "comno/impl/ip/basic_endpoint.h"
 #include "comno/impl/domain/basic_endpoint.h"
 
-#include "socket_exception.h"
-#include "socket_global.h"
+#include "comno/impl/exception/exception.h"
 #include "socket_base.h"
-#include "socket_t.h"
 
 namespace comno
 {
@@ -26,6 +26,10 @@ class basic_socket :
 public:
     using reuse_address = option::boolean_t<SOL_SOCKET, SO_REUSEADDR>;
 
+    /**
+     * construct socket.
+     * and create socket fd.
+     */
     basic_socket()
     {
         open();
@@ -56,6 +60,10 @@ public:
     {
     }
 
+    /**
+     * destruct socket.
+     * and close socket fd.
+     */
     ~basic_socket()
     {
         //shutdown();
@@ -87,7 +95,7 @@ public:
 
     /**
      * create socket file discriptor.
-     * throw comno::socket_exception, if fail.
+     * throw comno::exception, if fail.
      */
     void open(const protocol_t protocol = protocol_t())
     {
@@ -96,7 +104,7 @@ public:
 
         _sock_fd = ::socket(protocol.family(), protocol.type(), protocol.protocol());
         if( _sock_fd.illegal() ){
-            throw socket_exception(system::error_code(errno));
+            throw comno::exception(system::error_code(errno));
         }
     }
 
@@ -119,7 +127,7 @@ public:
 
         if (::connect(_sock_fd, ep.data(), ep.size()) == -1 ) {
             close();
-            throw socket_exception(system::error_code(errno));
+            throw comno::exception(system::error_code(errno));
         }
 
         _remote_ep = ep;
@@ -131,7 +139,7 @@ public:
     // set socket block or not.
     void block(bool val)
     {
-        comno::set_block(_sock_fd, val);
+        this->set_block(_sock_fd, val);
     }
 
     template<typename option_t>
@@ -140,7 +148,7 @@ public:
         system::error_code ec;
         option::setsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
-            throw socket_exception(ec);
+            throw comno::exception(ec);
     }
     template<typename option_t>
     void get_option(option_t& opt)
@@ -148,19 +156,23 @@ public:
         system::error_code ec;
         option::getsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
-            throw socket_exception(ec);
+            throw comno::exception(ec);
     }
 
+    std::size_t send(const std::string& buffer)
+    {
+        return this->send(buffer.c_str(), buffer.size());
+    }
     std::size_t send(const char* buffer)
     {
-        return send(buffer, strlen(buffer));
+        return this->send(buffer, strlen(buffer));
     }
 
     std::size_t send(const char* buffer, int size)
     {
         int ret =  ::send(_sock_fd, buffer, size, MSG_NOSIGNAL);
         if( ret <= 0 )
-            throw comno::socket_exception(comno::system::error_code(errno));
+            throw comno::exception(comno::system::error_code(errno));
 
         return ret;
     }
@@ -169,15 +181,20 @@ public:
     {
         int ret = ::recv(_sock_fd, buffer, max_size, 0);
         if( ret <= 0 )
-            throw comno::socket_exception(comno::system::error_code(errno));
+            throw comno::exception(comno::system::error_code(errno));
 
         return ret;
     }
 
-protected:
-    int fd() const 
+    int native_handle() const 
     {
         return _sock_fd;
+    }
+
+protected:
+    void set_block(bool blocked)
+    {
+        ::ioctl(_sock_fd, FIONBIO, blocked ? 0 : 1);
     }
 
 protected:
@@ -186,5 +203,6 @@ protected:
     endpoint_type _local_ep;
     endpoint_type _remote_ep;
 };
+
 }
 #endif

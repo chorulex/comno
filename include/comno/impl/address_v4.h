@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <comno/detail/detail.h>
+#include "comno/impl/detail/detail.h"
 
 namespace comno
 {

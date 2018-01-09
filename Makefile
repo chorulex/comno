@@ -13,6 +13,7 @@ SRC := $(wildcard *.cpp)
 SRC += $(wildcard */*.cpp)
 SRC += $(wildcard */*/*.cpp)
 SRC += $(wildcard */*/*/*.cpp)
+SRC += $(wildcard */*/*/*/*.cpp)
 
 #list of all soruce code directories
 SRC_DIR := $(sort $(dir $(SRC)))
@@ -21,6 +22,7 @@ INC := $(wildcard *.h)
 INC += $(wildcard */*.h)
 INC += $(wildcard */*/*.h)
 INC += $(wildcard */*/*/*.h)
+INC += $(wildcard */*/*/*/*.h)
 INC := $(sort $(dir $(INC)))
 #INCLUDE_DIR := $(foreach n, $(INC))
 

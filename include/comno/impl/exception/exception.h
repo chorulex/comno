@@ -7,10 +7,10 @@
 namespace comno
 {
 
-class socket_exception : public std::exception
+class exception : public std::exception
 {
 public:
-    socket_exception(const comno::system::error_code& err);
+    exception(const comno::system::error_code& err);
     int error_code() const { return _errno.value();}
 
 public:

@@ -128,35 +128,35 @@ void TestConnect()
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.186"), 30000);
         socket.connect(host);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , ECONNREFUSED );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.600"), 30000);
         socket.connect(host);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EINVAL );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.0"), 20000); //no this host
         socket.connect(host);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , ENETUNREACH );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.16"), 20000); //no this host
         socket.connect(host);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EHOSTUNREACH );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2"), 20000); //no this host
         socket.connect(host);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , ETIMEDOUT );
     }
 }
@@ -170,42 +170,42 @@ void TestConnectTimeout()
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.186"), 20000);
         socket.connect(host, 3);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , ECONNREFUSED );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.186"), 20000);
         socket.connect(host, 3);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , ECONNABORTED );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.600"), 20000); //no this host
         socket.connect(host, 3);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EINVAL );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.2"), 20000); //no this host
         socket.connect(host, 3);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EINPROGRESS );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.0"), 20000); //no this host
         socket.connect(host, 3);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EALREADY );
     }
 
     try{
         comno::tcp::endpoint host(comno::address_v4::from_string("192.168.2.16"), 20000); //no this host
         socket.connect(host, 3);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EALREADY );
     }
 }
@@ -219,7 +219,7 @@ void TestListen()
 
     try{
         srv.listen(22);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EACCES );
     }
 
@@ -232,7 +232,7 @@ void TestListen()
         tcp_server srv2;
         bool res = srv2.listen(-22);
         EQUAL(res , true);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , EINVAL );
     }
 }
@@ -290,6 +290,10 @@ void TestSendAndRecv()
         EQUAL(size, 11);
         EQUAL(std::string(buffer), "hello,comno");
 
+        ::memset(buffer, 0, sizeof(buffer));
+        size = client.receive(buffer, sizeof(buffer) - 1);
+        EQUAL(size, 11);
+        EQUAL(std::string(buffer), "hello,comno");
         srv.close();
     });
 
@@ -300,6 +304,9 @@ void TestSendAndRecv()
         client.connect(host);
 
         std::size_t size = client.send("hello,comno");
+        EQUAL(size, 11);
+
+        size = client.send(std::string("hello,comno"));
         EQUAL(size, 11);
 
         client.close();
@@ -334,7 +341,7 @@ void TestDomainListen()
 
     try{
         srv.listen(domain_file);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         NOT_EQUAL(ex.error_code(), EADDRINUSE);
     }
 }
@@ -346,7 +353,7 @@ void TestDomainConnect()
     tcp_domain_client client;
     try{
         client.connect(domain_file);
-    }catch(comno::socket_exception& ex){
+    }catch(comno::exception& ex){
         EQUAL(ex.error_code() , ENOENT );
     }
 }
@@ -377,6 +384,51 @@ void TestDomainAccept()
         client_thread.join();
 }
 
+void TestDomainSendAndRecv()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    ::unlink(domain_file);
+    comno::domain::stream_protocol::endpoint host(domain_file);
+
+    std::thread listen_thread([&host]{
+        comno::domain::stream_protocol::acceptor srv(host);
+        comno::domain::stream_protocol::socket client = srv.accept();
+
+        char buffer[32] = {0};
+        std::size_t size = client.receive(buffer, sizeof(buffer) - 1);
+        EQUAL(size, 11);
+        EQUAL(std::string(buffer), "hello,comno");
+
+        ::memset(buffer, 0, sizeof(buffer));
+        size = client.receive(buffer, sizeof(buffer) - 1);
+        EQUAL(size, 11);
+        EQUAL(std::string(buffer), "hello,comno");
+        srv.close();
+    });
+
+    std::thread client_thread([&host]{
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        comno::domain::stream_protocol::socket client;
+        client.connect(host);
+
+        std::size_t size = client.send("hello,comno");
+        EQUAL(size, 11);
+
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        size = client.send(std::string("hello,comno"));
+        EQUAL(size, 11);
+
+        client.close();
+    });
+
+    if( listen_thread.joinable() )
+        listen_thread.join();
+    if( client_thread.joinable() )
+        client_thread.join();
+}
+
 int main(int argc, char* argv[])
 {
     TestNetAddress();
@@ -394,6 +446,7 @@ int main(int argc, char* argv[])
     TestDomainListen();
     TestDomainConnect();
     TestDomainAccept();
+    TestDomainSendAndRecv();
 
     TestConnect();
     TestConnectTimeout();
