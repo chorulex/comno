@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#include "comno/impl/exception/exception.h"
+#include "comno/impl/exception/throw_exception.hpp"
 #include "address_v4.h"
 
 namespace comno
@@ -54,7 +54,7 @@ address_v4 address_v4::from_string(const char* addr_str)
 {
     struct in_addr addr;
     if(::inet_aton(addr_str, &addr) == 0){
-        throw comno::exception(system::error_code(EINVAL));
+        comno::throw_exception(EINVAL);
     }
 
     return address_v4(addr.s_addr);

@@ -10,7 +10,7 @@
 #include "comno/impl/ip/basic_endpoint.h"
 #include "comno/impl/domain/basic_endpoint.h"
 
-#include "comno/impl/exception/exception.h"
+#include "comno/impl/exception/throw_exception.hpp"
 #include "socket_base.h"
 
 namespace comno
@@ -104,7 +104,7 @@ public:
 
         _sock_fd = ::socket(protocol.family(), protocol.type(), protocol.protocol());
         if( _sock_fd.illegal() ){
-            throw comno::exception(system::error_code(errno));
+            throw_exception(errno);
         }
     }
 
@@ -127,7 +127,7 @@ public:
 
         if (::connect(_sock_fd, ep.data(), ep.size()) == -1 ) {
             close();
-            throw comno::exception(system::error_code(errno));
+            throw_exception(errno);
         }
 
         _remote_ep = ep;
@@ -148,7 +148,7 @@ public:
         system::error_code ec;
         option::setsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
-            throw comno::exception(ec);
+            throw_exception(ec);
     }
     template<typename option_t>
     void get_option(option_t& opt)
@@ -156,7 +156,7 @@ public:
         system::error_code ec;
         option::getsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
-            throw comno::exception(ec);
+            throw_exception(ec);
     }
 
     std::size_t send(const std::string& buffer)
@@ -170,9 +170,9 @@ public:
 
     std::size_t send(const char* buffer, int size)
     {
-        int ret =  ::send(_sock_fd, buffer, size, MSG_NOSIGNAL);
+        int ret = ::send(_sock_fd, buffer, size, MSG_NOSIGNAL);
         if( ret <= 0 )
-            throw comno::exception(comno::system::error_code(errno));
+            throw_exception(errno);
 
         return ret;
     }
@@ -181,7 +181,7 @@ public:
     {
         int ret = ::recv(_sock_fd, buffer, max_size, 0);
         if( ret <= 0 )
-            throw comno::exception(comno::system::error_code(errno));
+            throw_exception(errno);
 
         return ret;
     }

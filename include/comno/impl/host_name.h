@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <string>
 
-#include "comno/impl/exception/exception.h"
+#include "comno/impl/exception/throw_exception.hpp"
 
 namespace comno
 {
@@ -12,10 +12,8 @@ namespace comno
 std::string host_name()
 {
     char name[1024];
-    if( ::gethostname(name, sizeof(name)-1) != 0 ){
-        throw comno::exception(system::error_code(errno));
-        return "";
-    }
+    ::gethostname(name, sizeof(name)-1);
+    comno::throw_exception(errno);
 
     return std::string(name);
 }

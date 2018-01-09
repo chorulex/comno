@@ -5,7 +5,7 @@
 #include <cstddef>
 
 #include <sys/un.h>
-#include "comno/impl/exception/exception.h"
+#include "comno/impl/exception/throw_exception.hpp"
 #include "comno/impl/address_v4.h"
 
 namespace comno
@@ -62,7 +62,7 @@ private:
     void init(const char* path, std::size_t size)
     {
         if( size > sizeof(_addr.local.sun_path) - 1)
-            throw exception(system::error_code(ENAVAIL));
+            throw_exception(ENAVAIL);
 
         memset(&_addr, 0, sizeof(_addr));
         _addr.local.sun_family = AF_UNIX;

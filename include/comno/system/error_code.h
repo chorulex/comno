@@ -25,9 +25,9 @@ public:
     }
 
 public:
-    operator int() { return _errno;}
-    operator bool() { return _errno == 0;}
-    bool operator! () { return _errno != 0;}
+    operator int() const { return _errno;}
+    operator bool() const { return _errno == 0;}
+    bool operator! () const { return _errno != 0;}
 
     int value() const { return _errno;}
     const char* to_string() const;

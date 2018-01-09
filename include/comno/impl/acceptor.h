@@ -45,7 +45,7 @@ public:
 
         int clientSocket = ::accept(this->native_handle(), (struct sockaddr*)ep.data(), &addr_len);
         if (clientSocket == -1 )
-            throw comno::exception(comno::system::error_code(errno));
+            comno::throw_exception(errno);
 
         return socket(comno::socket_t(clientSocket), this->local_endpoint(), ep);
     }
@@ -56,14 +56,14 @@ private:
         this->local_endpoint(ep);
         int res = ::bind(this->native_handle(), ep.data(), ep.size());
         if( res == -1 )
-            throw comno::exception(comno::system::error_code(errno));
+            comno::throw_exception(errno);
     }
 
     void listen(int backlog = socket_base::max_listen_connections)
     {
         int res = ::listen(this->native_handle(), backlog);
         if( res == -1 ) 
-            throw comno::exception(comno::system::error_code(errno));
+            comno::throw_exception(errno);
     }
 };
 
