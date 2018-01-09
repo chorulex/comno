@@ -8,13 +8,12 @@ tcp_domain_client::tcp_domain_client() noexcept
 
 tcp_domain_client::tcp_domain_client(tcp_domain_client&& src) noexcept
 {
-    this->_socket = src._socket;
-    this->_endpoint = src._endpoint;
+    this->_socket = std::move(src._socket);
 }
 
-tcp_domain_client::tcp_domain_client(const comno::domain::stream_protocol::socket& sock_fd) noexcept
+tcp_domain_client::tcp_domain_client(comno::domain::stream_protocol::socket&& sock_fd) noexcept
 {
-    _socket = sock_fd;
+    this->_socket = std::move(sock_fd);
 }
 
 tcp_domain_client::~tcp_domain_client() noexcept
@@ -23,5 +22,11 @@ tcp_domain_client::~tcp_domain_client() noexcept
 
 bool tcp_domain_client::connect(const std::string& domain_file)
 {
-    return _socket.connect(comno::domain::stream_protocol::endpoint(domain_file));
+    try {
+        _socket.connect(comno::domain::stream_protocol::endpoint(domain_file));
+        return true;
+    }
+    catch( comno::socket_exception& ex){
+        return false;
+    }
 }

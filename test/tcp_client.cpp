@@ -8,17 +8,17 @@ tcp_client::tcp_client()noexcept
 
 tcp_client::tcp_client(tcp_client&& src) noexcept
 {
-    this->_socket = src._socket;
+    this->_socket = std::move(src._socket);
 }
 
 tcp_client& tcp_client::operator= (tcp_client&& src) noexcept
 {
-    this->_socket = src._socket;
+    this->_socket = std::move(src._socket);
     return *this;
 }
-tcp_client::tcp_client(const comno::tcp::socket& sock_fd)noexcept
+tcp_client::tcp_client(comno::tcp::socket& sock_fd)noexcept
 {
-    _socket = sock_fd;
+    _socket = std::move(sock_fd);
 }
 
 tcp_client::~tcp_client()noexcept

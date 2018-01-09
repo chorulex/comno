@@ -3,9 +3,8 @@
 
 #include <cstring>
 
-#include "comno/utility/noncopyable.h"
-#include "comno/impl/ip/endpoint.h"
-#include "comno/impl/domain/endpoint.h"
+#include "comno/impl/ip/basic_endpoint.h"
+#include "comno/impl/domain/basic_endpoint.h"
 #include "basic_socket.h"
 
 namespace comno
@@ -13,7 +12,6 @@ namespace comno
 
 template <typename protocol>
 class basic_acceptor:
-    public utility::noncopyable,
     public comno::basic_socket<protocol>
 {
     using endpoint = typename protocol::endpoint;
@@ -21,6 +19,14 @@ class basic_acceptor:
 public:
     using socket = typename protocol::socket;
 
+    /**
+     *  Bind to endpoint, and listen on this endpoint.
+     * 
+     * @NOTE: 
+     * If protocol is domain, endpoint include domain file path,
+     * if this file exist, fail to bind! So shuld to remove this file with unlink().
+     * 
+     */
     explicit basic_acceptor(const endpoint& ep, int backlog = socket_base::max_listen_connections)
     {
         bind(ep);
@@ -28,7 +34,6 @@ public:
     }
     ~basic_acceptor()
     {
-        this->close();
     }
 
 public:

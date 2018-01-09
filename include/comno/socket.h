@@ -5,8 +5,8 @@
 
 #include "comno/impl/socket_global.h"
 
-#include "comno/impl/ip/endpoint.h"
-#include "comno/impl/domain/endpoint.h"
+#include "comno/impl/ip/basic_endpoint.h"
+#include "comno/impl/domain/basic_endpoint.h"
 
 #include "comno/impl/socket_t.h"
 #include "comno/option/socket_option_ops.h"

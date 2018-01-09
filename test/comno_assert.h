@@ -11,7 +11,7 @@
         std::cout << " func    :" << __PRETTY_FUNCTION__ << std::endl;
 
 #define ASSERT_REGULAR_VAL(expr, expect, expect_bool) \
-    if( (expr != expect) == expect_bool ){\
+    if( (expr == expect) != expect_bool ){\
         ASSERT_PROMPT();\
         ASSERT_LOCATION();\
         std::cout << " detail:  " << "expr:\"" << #expr << "\" expect-value: " << expect <<", real-value: " << expr<< std::endl;\

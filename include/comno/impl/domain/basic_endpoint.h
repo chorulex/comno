@@ -1,7 +1,7 @@
 #ifndef _COMNO_DOMAIN_BASIC_ENDPOINT_H_
 #define _COMNO_DOMAIN_BASIC_ENDPOINT_H_
 
-#include "comno/impl/domain/endpoint.h"
+#include "comno/impl/domain/detail/endpoint.h"
 
 namespace comno
 {

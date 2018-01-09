@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "comno_assert.h"
 
@@ -213,54 +215,41 @@ void TestListen()
     TEST_PROMPT(__FUNCTION__);
     tcp_server srv;
 
-    EQUAL( srv.is_open(), true);
+    EQUAL( srv.is_open(), false);
 
     try{
         srv.listen(22);
     }catch(comno::socket_exception& ex){
         EQUAL(ex.error_code() , EACCES );
     }
-    unsigned int port = srv.listen_port();
-    EQUAL(port , 0);
+
+    EQUAL( srv.is_open(), false);
     srv.close();
 
     EQUAL( srv.is_open(), false );
 
-    tcp_server srv2;
-    srv2.listen(20000);
-    port = srv2.listen_port();
-    EQUAL(port , 20000);
-
     try{
-        bool res = srv2.listen(20000);
+        tcp_server srv2;
+        bool res = srv2.listen(-22);
         EQUAL(res , true);
     }catch(comno::socket_exception& ex){
         EQUAL(ex.error_code() , EINVAL );
     }
-
-    try{
-        tcp_server srv3;
-        bool res = srv3.listen(20000);
-    }catch(comno::socket_exception& ex){
-        EQUAL(ex.error_code() , EADDRINUSE );
-    }
-    srv2.close();
 }
 
-#include <thread>
-#include <chrono>
 void TestAccept()
 {
     TEST_PROMPT(__FUNCTION__);
 
-    std::thread listen_thread([]{
-        tcp_server srv;
-        srv.reuse_address(true);
+    tcp_server srv;
+    srv.reuse_address(true);
 
-        srv.listen(20000);
-        EQUAL(srv.local_endpoint().port() , 20000);
-        EQUAL(srv.local_endpoint().address().to_string() , "0.0.0.0");
+    srv.listen(20000);
+    EQUAL(srv.local_endpoint().port() , 20000);
+    EQUAL(srv.local_endpoint().address().to_string() , "0.0.0.0");
 
+
+    std::thread listen_thread([&srv]{
         tcp_client client = srv.accept();
         NOT_EQUAL(client.remote_endpoint().port() , 0);
         EQUAL(client.remote_endpoint().address().to_string() , "127.0.0.1");
@@ -283,8 +272,44 @@ void TestAccept()
         listen_thread.join();
     if( client_thread.joinable() )
         client_thread.join();
+    srv.close();
 }
 
+void TestSendAndRecv()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    comno::tcp::endpoint host(comno::address_v4::from_string("127.0.0.1"), 20000);
+
+    std::thread listen_thread([&host]{
+        comno::tcp::acceptor srv(host);
+        comno::tcp::socket client = srv.accept();
+
+        char buffer[32] = {0};
+        std::size_t size = client.receive(buffer, sizeof(buffer) - 1);
+        EQUAL(size, 11);
+        EQUAL(std::string(buffer), "hello,comno");
+
+        srv.close();
+    });
+
+    std::thread client_thread([&host]{
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+        comno::tcp::socket client;
+        client.connect(host);
+
+        std::size_t size = client.send("hello,comno");
+        EQUAL(size, 11);
+
+        client.close();
+    });
+
+    if( listen_thread.joinable() )
+        listen_thread.join();
+    if( client_thread.joinable() )
+        client_thread.join();
+}
 void TestDomainSocket()
 {
     TEST_PROMPT(__FUNCTION__);
@@ -325,6 +350,7 @@ void TestDomainConnect()
         EQUAL(ex.error_code() , ENOENT );
     }
 }
+
 void TestDomainAccept()
 {
     TEST_PROMPT(__FUNCTION__);
@@ -334,7 +360,7 @@ void TestDomainAccept()
         srv.listen(domain_file);
 
         tcp_domain_client client = srv.accept();
-        EQUAL(client.domain_file() , domain_file);
+        EQUAL(client.domain_file() , std::string(domain_file));
     });
 
     std::thread client_thread([]{
@@ -342,7 +368,7 @@ void TestDomainAccept()
 
         tcp_domain_client client;
         client.connect(domain_file);
-        EQUAL(client.domain_file() , domain_file);
+        EQUAL(client.domain_file() , std::string(""));
     });
 
     if( listen_thread.joinable() )
@@ -359,7 +385,10 @@ int main(int argc, char* argv[])
     TestCreateTCPSocket();
     TestSockOpt();
     TestTCPSockTimeout();
+
+    TestListen();
     TestAccept();
+    TestSendAndRecv();
 
     TestDomainSocket();
     TestDomainListen();
@@ -368,7 +397,6 @@ int main(int argc, char* argv[])
 
     TestConnect();
     TestConnectTimeout();
-    TestListen();
 
     return 0;
 }

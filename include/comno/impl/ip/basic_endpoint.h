@@ -1,7 +1,7 @@
 #ifndef _COMNO_IP_BASIC_ENDPOINT_H_
 #define _COMNO_IP_BASIC_ENDPOINT_H_
 
-#include "endpoint.h"
+#include "comno/impl/ip/detail/endpoint.h"
 
 namespace comno
 {

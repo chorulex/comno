@@ -3,10 +3,13 @@
 
 #include <string>
 
+#include "comno/utility/noncopyable.h"
 #include "comno/option/socket_option_ops.h"
+#include "comno/impl/ip/basic_endpoint.h"
+#include "comno/impl/domain/basic_endpoint.h"
+
 #include "socket_exception.h"
 #include "socket_global.h"
-#include "ip/endpoint.h"
 #include "socket_base.h"
 #include "socket_t.h"
 
@@ -14,7 +17,9 @@ namespace comno
 {
 
 template <typename protocol_t>
-class basic_socket : public socket_base
+class basic_socket :
+        public comno::utility::noncopyable,
+        public socket_base
 {
     using endpoint_type = typename protocol_t::endpoint;
 
@@ -26,18 +31,35 @@ public:
         open();
     }
 
+    basic_socket(basic_socket&& other)
+        :_sock_fd(other._sock_fd)
+        ,_local_ep(other._local_ep)
+        ,_remote_ep(other._remote_ep)
+    {
+       other._sock_fd.reset(); 
+    }
+
+    basic_socket& operator= (basic_socket&& other)
+    {
+        _sock_fd = other._sock_fd;
+        _local_ep = other._local_ep;
+        _remote_ep = other._remote_ep;
+
+       other._sock_fd.reset(); 
+       return *this;
+    }
+
     basic_socket(const socket_t& sock, const endpoint_type& local, const endpoint_type& remote)
         :_sock_fd(sock)
         ,_local_ep(local)
         ,_remote_ep(remote)
     {
-        //shutdown();
-        close();
     }
 
     ~basic_socket()
     {
-
+        //shutdown();
+        close();
     }
 
 public:
@@ -58,6 +80,11 @@ public:
         _remote_ep = ep;
     }
 
+    bool is_open() const
+    {
+        return !_sock_fd.illegal();
+    }
+
     /**
      * create socket file discriptor.
      * throw comno::socket_exception, if fail.
@@ -73,38 +100,33 @@ public:
         }
     }
 
-    bool is_open() const
+    /**
+     * close socket file discriptor, and release fd resource to system.
+     */
+    void close()
     {
-        return !_sock_fd.illegal();
+        if( is_open() ){
+            ::close(_sock_fd);
+            _sock_fd.reset();
+        }
     }
-    bool connect(const endpoint_type& ep)
+
+    void connect(const endpoint_type& ep)
     {
+        if( !is_open() ){
+            open();
+        }
+
         if (::connect(_sock_fd, ep.data(), ep.size()) == -1 ) {
             close();
             throw socket_exception(system::error_code(errno));
         }
 
         _remote_ep = ep;
-        return true;
     }
 
     // shutdown socket.
     void shutdown();
-
-    /**
-     * close socket file discriptor, and release fd resource to system.
-     */
-    void close()
-    {
-        if( is_open() )
-            _sock_fd.reset();
-
-        /*
-        if( protocol_t().family() == AF_UNIX ){
-            unlink(this->_local_ep.path());
-        }
-        */
-    }
 
     // set socket block or not.
     void block(bool val)
@@ -129,11 +151,34 @@ public:
             throw socket_exception(ec);
     }
 
+    std::size_t send(const char* buffer)
+    {
+        return send(buffer, strlen(buffer));
+    }
+
+    std::size_t send(const char* buffer, int size)
+    {
+        int ret =  ::send(_sock_fd, buffer, size, MSG_NOSIGNAL);
+        if( ret <= 0 )
+            throw comno::socket_exception(comno::system::error_code(errno));
+
+        return ret;
+    }
+
+    std::size_t receive(char* buffer, std::size_t max_size)
+    {
+        int ret = ::recv(_sock_fd, buffer, max_size, 0);
+        if( ret <= 0 )
+            throw comno::socket_exception(comno::system::error_code(errno));
+
+        return ret;
+    }
+
+protected:
     int fd() const 
     {
         return _sock_fd;
     }
-protected:
 
 protected:
     socket_t _sock_fd;

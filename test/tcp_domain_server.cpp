@@ -12,12 +12,14 @@ tcp_domain_server::~tcp_domain_server()
 
 bool tcp_domain_server::listen(const std::string& path)
 {
-    _acceptor = new comno::domain::stream_protocol::acceptor(comno::domain::stream_protocol::endpoint(path));
+    ::unlink(path.c_str());
+
+    comno::domain::stream_protocol::endpoint ep(path);
+    _acceptor = new comno::domain::stream_protocol::acceptor(ep);
     return true;
 }
 
 tcp_domain_client tcp_domain_server::accept() 
 { 
-    comno::domain::stream_protocol::socket client = _acceptor->accept();
-    return tcp_domain_client(client);
+    return tcp_domain_client(_acceptor->accept());
 }

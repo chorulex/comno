@@ -10,7 +10,7 @@ class tcp_client
 
 public:
     tcp_client() noexcept;
-    explicit tcp_client(const comno::tcp::socket& sock_fd) noexcept;
+    explicit tcp_client(comno::tcp::socket& sock_fd) noexcept;
     tcp_client(tcp_client&&) noexcept;
     tcp_client& operator= (tcp_client&&) noexcept;
 
