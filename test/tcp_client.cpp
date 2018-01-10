@@ -96,24 +96,24 @@ bool tcp_client::connect_timeout(time_t timeout_sec)
 
 void tcp_client::set_recv_timeout(time_t timeout)//seconds
 {
-    _socket.set_option(comno::option::timeval_t<SOL_SOCKET, SO_RCVTIMEO>(timeout));
+    _socket.set_option(comno::tcp::socket::receive_timeout(timeout));
 }
 
 time_t tcp_client::get_recv_timeout() //seconds
 {
-    comno::option::timeval_t<SOL_SOCKET, SO_RCVTIMEO> opt;
+    comno::tcp::socket::receive_timeout opt;
     _socket.get_option(opt);
     return opt.value().tv_sec;
 }
 
 void tcp_client::set_send_timeout(time_t timeout)//seconds
 {
-    _socket.set_option(comno::option::timeval_t<SOL_SOCKET, SO_SNDTIMEO>(timeout));
+    _socket.set_option(comno::tcp::socket::send_timeout(timeout));
 }
 
 time_t tcp_client::get_send_timeout() //seconds
 {
-    comno::option::timeval_t<SOL_SOCKET, SO_SNDTIMEO> opt;
+    comno::tcp::socket::send_timeout opt;
     _socket.get_option(opt);
     return opt.value().tv_sec;
 }

@@ -88,7 +88,7 @@ void TestSockOpt()
 
     const int rec_buff_size = 2048;
 
-    comno::option::integer_t<SOL_SOCKET, SO_RCVBUF> opt(rec_buff_size);
+    comno::tcp::socket::receive_buf_size opt(rec_buff_size);
     EQUAL( opt.level() , SOL_SOCKET);
     EQUAL( opt.name() , SO_RCVBUF);
     EQUAL( opt.size() , sizeof(int) );
@@ -306,6 +306,7 @@ void TestSendAndRecv()
         std::size_t size = client.send("hello,comno");
         EQUAL(size, 11);
 
+        std::this_thread::sleep_for(std::chrono::seconds(2));
         size = client.send(std::string("hello,comno"));
         EQUAL(size, 11);
 

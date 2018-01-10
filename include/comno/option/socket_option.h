@@ -178,6 +178,82 @@ public:
 private:
     struct timeval _value;
 };
+
+/**
+ * SO_LINGER option,
+ * For TCP/SCTP, not UDP. 
+ * 
+ * sepcify timeout units as seconds.
+ */
+template <int level_val, int name_val>
+class linger_t : public option_context<level_val, name_val>
+{
+public:
+    linger_t()
+    {
+        _value.l_onoff = 0;
+        _value.l_linger = 0;
+    }
+    linger_t(bool e, int t)
+    {
+        enable(e);
+        timeout(t);
+    }
+
+public:
+    std::size_t size() const 
+    {
+        return sizeof(_value);
+    }
+    void resize(const std::size_t& size_v)
+    {
+        if( size_v != size() ){
+            throw std::length_error("integer socket option resize");
+        }
+    }
+
+    void enable(bool e)
+    {
+        _value.l_onoff = enable ? 1 : 0;
+    }
+
+    bool enable() const
+    {
+        return _value.l_onoff != 0;
+    }
+
+    void timeout(int t)
+    {
+        _value.l_linger = t;
+    }
+
+    int timeout() const
+    {
+        return _value.l_linger;
+    }
+
+    struct linger* data()
+    {
+        return &_value;
+    }
+    const struct linger* data() const
+    {
+        return &_value;
+    }
+    struct linger value() const
+    {
+        return _value;
+    }
+
+    operator struct linger()
+    {
+        return _value;
+    }
+
+private:
+    struct linger _value;
+};
+
 }
 }
 

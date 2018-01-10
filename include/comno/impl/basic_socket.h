@@ -24,7 +24,15 @@ class basic_socket :
     using endpoint_type = typename protocol_t::endpoint;
 
 public:
-    using reuse_address = option::boolean_t<SOL_SOCKET, SO_REUSEADDR>;
+    using reuse_address = comno::option::boolean_t<SOL_SOCKET, SO_REUSEADDR>;
+
+    using receive_timeout = comno::option::timeval_t<SOL_SOCKET, SO_RCVTIMEO>;
+    using send_timeout = comno::option::timeval_t<SOL_SOCKET, SO_SNDTIMEO>;
+
+    using receive_buf_size = comno::option::integer_t<SOL_SOCKET, SO_RCVBUF>;
+    using send_buf_size = comno::option::integer_t<SOL_SOCKET, SO_SNDBUF>;
+
+    using linger = comno::option::linger_t<SOL_SOCKET, SO_LINGER>;
 
     /**
      * construct socket.
