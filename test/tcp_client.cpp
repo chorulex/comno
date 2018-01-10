@@ -103,7 +103,7 @@ time_t tcp_client::get_recv_timeout() //seconds
 {
     comno::tcp::socket::receive_timeout opt;
     _socket.get_option(opt);
-    return opt.value().tv_sec;
+    return opt.timeout();
 }
 
 void tcp_client::set_send_timeout(time_t timeout)//seconds
@@ -115,5 +115,5 @@ time_t tcp_client::get_send_timeout() //seconds
 {
     comno::tcp::socket::send_timeout opt;
     _socket.get_option(opt);
-    return opt.value().tv_sec;
+    return opt.timeout();
 }
