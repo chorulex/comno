@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 
 #include "comno/impl/ip/basic_endpoint.h"
+#include "comno/impl/basic_stream_socket.h"
 #include "acceptor.h"
 #include "basic_socket.h"
 
@@ -13,12 +14,10 @@ namespace comno
 
 class tcp
 {
-    #define PROTOCOL_TCP 6
-
 public:
     using endpoint = comno::ip::basic_endpoint;
 
-    using socket = comno::basic_socket<tcp>;
+    using socket = comno::basic_stream_socket<tcp>;
     using acceptor = comno::basic_acceptor<tcp>;
 
     int family() const
@@ -32,7 +31,7 @@ public:
     }
     int protocol() const
     {
-        return PROTOCOL_TCP;
+        return IPPROTO_TCP;
     }
 
 protected:

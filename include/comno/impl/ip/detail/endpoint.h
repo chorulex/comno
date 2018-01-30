@@ -38,6 +38,11 @@ public:
         _addr.v4.sin_port = ::htons(port);
     }
 
+    struct sockaddr *data()
+    {
+        return &_addr.base;
+    }
+
     const struct sockaddr *data() const
     {
         return &_addr.base;

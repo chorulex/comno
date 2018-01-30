@@ -6,7 +6,7 @@
 
 #include "comno/impl/domain/basic_endpoint.h"
 #include "acceptor.h"
-#include "basic_socket.h"
+#include "comno/impl/basic_stream_socket.h"
 
 namespace comno
 {
@@ -18,7 +18,7 @@ class stream_protocol
 public:
     using endpoint = comno::domain::basic_endpoint;
 
-    using socket = comno::basic_socket<stream_protocol>;
+    using socket = comno::basic_stream_socket<stream_protocol>;
     using acceptor = comno::basic_acceptor<stream_protocol>;
 
 public:

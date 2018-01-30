@@ -430,6 +430,24 @@ void TestDomainSendAndRecv()
         client_thread.join();
 }
 
+void TestUDP()
+{
+    TEST_PROMPT(__FUNCTION__);
+
+    comno::udp::endpoint host(comno::address_v4::from_string("127.0.0.1"), 20000);
+
+    comno::udp::socket client;
+    const std::string buffer("hello, comno udp.");
+    std::size_t size = client.send_to(host, buffer);
+    EQUAL(size, buffer.size());
+
+    comno::udp::socket svr;
+
+    char msg[64] = {0};
+    size = svr.receive_from(host, msg, sizeof(msg)-1);
+    EQUAL(size, buffer.size());
+}
+
 int main(int argc, char* argv[])
 {
     TestNetAddress();
@@ -448,6 +466,8 @@ int main(int argc, char* argv[])
     TestDomainConnect();
     TestDomainAccept();
     TestDomainSendAndRecv();
+
+    TestUDP();
 
     TestConnect();
     TestConnectTimeout();

@@ -5,7 +5,8 @@
 
 #include "comno/impl/ip/basic_endpoint.h"
 #include "comno/impl/domain/basic_endpoint.h"
-#include "basic_socket.h"
+#include "comno/impl/basic_socket.h"
+#include "comno/impl/basic_stream_socket.h"
 
 namespace comno
 {

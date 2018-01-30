@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
-#include "comno/utility/noncopyable.h"
 #include "comno/option/socket_option_ops.h"
 #include "comno/impl/ip/basic_endpoint.h"
 #include "comno/impl/domain/basic_endpoint.h"
@@ -17,9 +16,7 @@ namespace comno
 {
 
 template <typename protocol_t>
-class basic_socket :
-        public comno::utility::noncopyable,
-        public socket_base
+class basic_socket : public socket_base
 {
     using endpoint_type = typename protocol_t::endpoint;
 
@@ -68,6 +65,7 @@ public:
     {
     }
 
+protected:
     /**
      * destruct socket.
      * and close socket fd.
@@ -165,33 +163,6 @@ public:
         option::getsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
             throw_exception(ec);
-    }
-
-    std::size_t send(const std::string& buffer)
-    {
-        return this->send(buffer.c_str(), buffer.size());
-    }
-    std::size_t send(const char* buffer)
-    {
-        return this->send(buffer, strlen(buffer));
-    }
-
-    std::size_t send(const char* buffer, int size)
-    {
-        int ret = ::send(_sock_fd, buffer, size, MSG_NOSIGNAL);
-        if( ret <= 0 )
-            throw_exception(errno);
-
-        return ret;
-    }
-
-    std::size_t receive(char* buffer, std::size_t max_size)
-    {
-        int ret = ::recv(_sock_fd, buffer, max_size, 0);
-        if( ret <= 0 )
-            throw_exception(errno);
-
-        return ret;
     }
 
     int native_handle() const 
