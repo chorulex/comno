@@ -283,7 +283,11 @@ void TestSendAndRecv()
 
     std::thread listen_thread([&host]{
         comno::tcp::acceptor srv(host);
+        EQUAL(srv.local_endpoint(), host)
+
         comno::tcp::socket client = srv.accept();
+        NOT_EQUAL(client.remote_endpoint().port(), 0);
+        EQUAL(client.local_endpoint(), host);
 
         char buffer[32] = {0};
         std::size_t size = client.receive(buffer, sizeof(buffer) - 1);
@@ -302,6 +306,8 @@ void TestSendAndRecv()
 
         comno::tcp::socket client;
         client.connect(host);
+        NOT_EQUAL(client.local_endpoint().port(), 0);
+        EQUAL(client.local_endpoint().address(), host.address());
 
         std::size_t size = client.send("hello,comno");
         EQUAL(size, 11);
@@ -448,7 +454,8 @@ void TestUDP()
     comno::udp::endpoint ep;
     size = svr.receive_from(ep, msg, sizeof(msg)-1);
     EQUAL(size, buffer.size());
-    //EQUAL(ep, client.local_endpoint());
+    EQUAL(ep.address().to_string(), "127.0.0.1");
+    NOT_EQUAL(ep.port(), 0);
 }
 
 int main(int argc, char* argv[])

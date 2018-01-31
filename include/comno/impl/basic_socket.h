@@ -112,8 +112,6 @@ public:
         if( _sock_fd.illegal() ){
             throw_exception(errno);
         }
-
-        resolver_local_endpoint();
     }
 
     /**
@@ -139,6 +137,7 @@ public:
         }
 
         _remote_ep = ep;
+        resolver_local_endpoint();
     }
 
     void bind(const endpoint_type& ep)
@@ -189,11 +188,12 @@ protected:
 private:
     void resolver_local_endpoint()
     {
-        socklen_t len;
+        socklen_t len = _local_ep.size();
         int ret = ::getsockname(_sock_fd,
                         const_cast<comno::type::sockaddr_base*>(this->_local_ep.data()),
                         &len);
-        comno::throw_exception(ret);
+        if( ret == -1 )
+            comno::throw_exception(errno);
     }
 
 
