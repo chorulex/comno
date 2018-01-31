@@ -435,17 +435,20 @@ void TestUDP()
     TEST_PROMPT(__FUNCTION__);
 
     comno::udp::endpoint host(comno::address_v4::from_string("127.0.0.1"), 20000);
+    const std::string buffer("hello, comno udp.");
+
+    comno::udp::socket svr;
+    svr.bind(host);
 
     comno::udp::socket client;
-    const std::string buffer("hello, comno udp.");
     std::size_t size = client.send_to(host, buffer);
     EQUAL(size, buffer.size());
 
-    comno::udp::socket svr;
-
     char msg[64] = {0};
-    size = svr.receive_from(host, msg, sizeof(msg)-1);
+    comno::udp::endpoint ep;
+    size = svr.receive_from(ep, msg, sizeof(msg)-1);
     EQUAL(size, buffer.size());
+    //EQUAL(ep, client.local_endpoint());
 }
 
 int main(int argc, char* argv[])

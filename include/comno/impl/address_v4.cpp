@@ -14,7 +14,7 @@ address_v4::address_v4()
     _addr = htonl(INADDR_ANY);
 }
 
-address_v4::address_v4(detail::in_v4_addr_t addr)
+address_v4::address_v4(comno::type::in_v4_addr_t addr)
 {
     _addr = addr;
 }
@@ -35,7 +35,7 @@ std::string address_v4::to_string() const
     return ::inet_ntoa(addr);
 }
 
-detail::in_v4_addr_t address_v4::to_uint() const
+comno::type::in_v4_addr_t address_v4::to_uint() const
 {
     return _addr;
 }

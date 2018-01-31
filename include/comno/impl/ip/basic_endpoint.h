@@ -16,7 +16,7 @@ public:
     basic_endpoint(const basic_endpoint& src) : _impl(src._impl)
     {
     }
-    basic_endpoint(const detail::in_v4_addr_t& addr, unsigned short port) : _impl(addr, port)
+    basic_endpoint(const comno::type::in_v4_addr_t& addr, unsigned short port) : _impl(addr, port)
     {
     }
     basic_endpoint(const address_v4& addr, unsigned short port) : _impl(addr, port)
@@ -46,7 +46,7 @@ public:
     {
         _impl.address(addr);
     }
-    void address(const detail::in_v4_addr_t& addr)
+    void address(const comno::type::in_v4_addr_t& addr)
     {
         _impl.address(addr);
     }
@@ -58,6 +58,23 @@ public:
     void port(unsigned short val)
     {
         _impl.port(val);
+    }
+
+    bool operator== (const basic_endpoint& other)
+    {
+        return address() == other.address() && port() == other.port();
+    }
+
+    bool operator!= (const basic_endpoint& other)
+    {
+        return !(this->operator==(other));
+    }
+
+    template <typename Elem, typename Traits>
+    friend std::basic_ostream<Elem, Traits>& operator<<(
+        std::basic_ostream<Elem, Traits>& os, const basic_endpoint& ep)
+    {
+        return os << ep.address() << ":" << ep.port();
     }
 
 private:

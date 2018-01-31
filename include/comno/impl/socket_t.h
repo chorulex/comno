@@ -1,5 +1,5 @@
-#ifndef _COMNO_SOCKET_TYPE_H_
-#define _COMNO_SOCKET_TYPE_H_
+#ifndef _COMNO_SOCKET_T_H_
+#define _COMNO_SOCKET_T_H_
 
 #include <unistd.h>
 

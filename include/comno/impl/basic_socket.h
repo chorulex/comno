@@ -112,6 +112,8 @@ public:
         if( _sock_fd.illegal() ){
             throw_exception(errno);
         }
+
+        resolver_local_endpoint();
     }
 
     /**
@@ -137,6 +139,14 @@ public:
         }
 
         _remote_ep = ep;
+    }
+
+    void bind(const endpoint_type& ep)
+    {
+        local_endpoint(ep);
+        int res = ::bind(native_handle(), ep.data(), ep.size());
+        if( res == -1 )
+            comno::throw_exception(errno);
     }
 
     // shutdown socket.
@@ -175,6 +185,17 @@ protected:
     {
         ::ioctl(_sock_fd, FIONBIO, blocked ? 0 : 1);
     }
+
+private:
+    void resolver_local_endpoint()
+    {
+        socklen_t len;
+        int ret = ::getsockname(_sock_fd,
+                        const_cast<comno::type::sockaddr_base*>(this->_local_ep.data()),
+                        &len);
+        comno::throw_exception(ret);
+    }
+
 
 protected:
     socket_t _sock_fd;

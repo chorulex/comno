@@ -3,7 +3,7 @@
 
 #include <cstring>
 #include <string>
-#include "comno/impl/detail/detail.h"
+#include "comno/impl/detail/socket_type.h"
 #include "comno/impl/address_v4.h"
 
 namespace comno
@@ -21,7 +21,7 @@ public:
     endpoint(const endpoint& src) : _addr(src._addr)
     {
     }
-    endpoint(const detail::in_v4_addr_t& addr, unsigned short port)
+    endpoint(const comno::type::in_v4_addr_t& addr, unsigned short port)
     {
         ::memset(&_addr, 0, sizeof(_addr));
         _addr.v4.sin_family = AF_INET;
@@ -61,7 +61,7 @@ public:
     {
         _addr.v4.sin_addr.s_addr = addr.to_uint();
     }
-    void address(const detail::in_v4_addr_t& addr)
+    void address(const comno::type::in_v4_addr_t& addr)
     {
         _addr.v4.sin_addr.s_addr = addr;
     }
@@ -78,8 +78,8 @@ public:
 private:
     union addr_union
     {
-        struct sockaddr base;
-        struct sockaddr_in v4;
+        comno::type::sockaddr_base    base;
+        comno::type::sockaddr_in_v4   v4;
         // reserved for v6
     }_addr;
 };

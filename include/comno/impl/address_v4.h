@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "comno/impl/detail/detail.h"
+#include "comno/impl/detail/socket_type.h"
 
 namespace comno
 {
@@ -14,7 +14,7 @@ public:
     address_v4(const address_v4&);
 
     // construct from network byte order address.
-    explicit address_v4(detail::in_v4_addr_t);
+    explicit address_v4(comno::type::in_v4_addr_t);
 
     address_v4& operator= (const address_v4&);
     bool operator== (const address_v4&);
@@ -25,7 +25,7 @@ public:
      * return "0.0.0.0"
      */
     std::string to_string() const;
-    detail::in_v4_addr_t to_uint() const;
+    comno::type::in_v4_addr_t to_uint() const;
 
     static address_v4 any();
     static address_v4 from_string(const char* addr_str);
@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    detail::in_v4_addr_t _addr;
+    comno::type::in_v4_addr_t _addr;
 };
 
 }
