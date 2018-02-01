@@ -1,9 +1,6 @@
 #include <cstring>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
+#include "comno/impl/detail/socket_ops.h"
 #include "comno/impl/exception/throw_exception.hpp"
 #include "address_v4.h"
 
@@ -11,7 +8,7 @@ namespace comno
 {
 address_v4::address_v4()
 {
-    _addr = htonl(INADDR_ANY);
+    _addr = comno::detail::socket_ops::host_to_network_long(INADDR_ANY);
 }
 
 address_v4::address_v4(comno::type::in_v4_addr_t addr)

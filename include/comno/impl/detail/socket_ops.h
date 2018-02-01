@@ -2,6 +2,8 @@
 #define _COMNO_SOCKET_OPS_H_
 
 #include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <unistd.h>
 
 #include <string>
@@ -165,6 +167,25 @@ std::size_t recvfrom(comno::type::socket_type fd,
     return ret == -1 ? 0 : ret;
 }
 
+uint16_t host_to_network_short(uint16_t val)
+{
+    return ::htons(val);
+}
+
+uint32_t host_to_network_long(uint32_t val)
+{
+    return ::htonl(val);
+}
+
+uint16_t network_to_host_short(uint16_t val)
+{
+    return ::ntohs(val);
+}
+
+uint32_t network_to_host_long(uint32_t val)
+{
+    return ::ntohl(val);
+}
 } // end namespace socket_ops
 
 } // end namespace detail

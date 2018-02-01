@@ -3,6 +3,8 @@
 
 #include <cstring>
 #include <string>
+
+#include "comno/impl/detail/socket_ops.h"
 #include "comno/impl/detail/socket_type.h"
 #include "comno/impl/address_v4.h"
 
@@ -27,7 +29,7 @@ public:
         _addr.v4.sin_family = AF_INET;
 
         _addr.v4.sin_addr.s_addr = addr;
-        _addr.v4.sin_port = ::htons(port);
+        _addr.v4.sin_port = comno::detail::socket_ops::host_to_network_short(port);
     }
     endpoint(const address_v4& addr, unsigned short port)
     {
@@ -35,7 +37,7 @@ public:
         _addr.v4.sin_family = AF_INET;
 
         _addr.v4.sin_addr.s_addr = addr.to_uint();
-        _addr.v4.sin_port = ::htons(port);
+        _addr.v4.sin_port = comno::detail::socket_ops::host_to_network_short(port);
     }
 
     struct sockaddr *data()
@@ -68,11 +70,11 @@ public:
 
     unsigned short port() const
     {
-        return ::ntohs(_addr.v4.sin_port);
+        return comno::detail::socket_ops::network_to_host_short(_addr.v4.sin_port);
     }
     void port(unsigned short val)
     {
-        _addr.v4.sin_port = ::htons(val);
+        _addr.v4.sin_port = comno::detail::socket_ops::host_to_network_short(val);
     }
 
 private:
