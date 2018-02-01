@@ -45,30 +45,27 @@ public:
 
     std::size_t send_to(const endpoint_type& ep, const std::string& buffer)
     {
-        int ret = ::sendto(this->_sock_fd,
-                            buffer.c_str(),
-                            buffer.size(),
+        comno::system::error_code ec;
+        std::size_t ret = comno::detail::socket_ops::sendto(this->_sock_fd,
+                            buffer.c_str(), buffer.size(),
                             MSG_NOSIGNAL,
-                            ep.data(),
-                            ep.size());
-        if( ret <= 0 )
-            throw_exception(errno);
-
+                            ep.data(), ep.size(),
+                            ec);
+        throw_exception(ec);
         return ret;
     }
 
     std::size_t receive_from(endpoint_type& ep, char* buffer, std::size_t max_size)
     {
-        socklen_t len = ep.size();
-        int ret = ::recvfrom(this->_sock_fd,
-                            buffer,
-                            max_size,
-                            MSG_NOSIGNAL,
-                            ep.data(),
-                            &len);
-        if( ret <= 0 )
-            throw_exception(errno);
+        comno::system::error_code ec;
 
+        socklen_t len = ep.size();
+        std::size_t ret = comno::detail::socket_ops::recvfrom(this->_sock_fd,
+                            buffer, max_size,
+                            MSG_NOSIGNAL,
+                            ep.data(), &len,
+                            ec);
+        throw_exception(ec);
         return ret;
     }
 };

@@ -61,9 +61,9 @@ void TestNetAddress()
     comno::address_v4 addr;
     
     const char* ip = "127.0.0.1";
-    comno::address_v4 addr_from_str = comno::address_v4::from_string(ip);
-    comno::address_v4 addr_from_str_1 = comno::address_v4::from_string(std::string(ip));
-    comno::address_v4 addr_default = comno::address_v4::any();
+    /*comno::address_v4 addr_from_str = */comno::address_v4::from_string(ip);
+    /*comno::address_v4 addr_from_str_1 = */comno::address_v4::from_string(std::string(ip));
+    /*comno::address_v4 addr_default = */comno::address_v4::any();
 }
 void TestCreateTCPSocket()
 {

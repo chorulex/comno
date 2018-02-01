@@ -37,6 +37,10 @@ public:
     }
 
 public:
+    struct sockaddr* data()
+    {
+        return &_addr.base;
+    }
     const struct sockaddr* data() const
     {
         return &_addr.base;

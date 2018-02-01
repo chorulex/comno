@@ -54,18 +54,18 @@ public:
 
     std::size_t send(const char* buffer, int size)
     {
-        int ret = ::send(this->_sock_fd, buffer, size, MSG_NOSIGNAL);
-        if( ret <= 0 )
-            throw_exception(errno);
+        comno::system::error_code ec;
+        std::size_t ret = comno::detail::socket_ops::send(this->_sock_fd, buffer, size, MSG_NOSIGNAL, ec);
+        throw_exception(ec);
 
         return ret;
     }
 
     std::size_t receive(char* buffer, std::size_t max_size)
     {
-        int ret = ::recv(this->_sock_fd, buffer, max_size, 0);
-        if( ret <= 0 )
-            throw_exception(errno);
+        comno::system::error_code ec;
+        std::size_t ret = comno::detail::socket_ops::recv(this->_sock_fd, buffer, max_size, MSG_NOSIGNAL, ec);
+        throw_exception(ec);
 
         return ret;
     }

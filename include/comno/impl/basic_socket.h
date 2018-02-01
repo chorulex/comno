@@ -2,14 +2,12 @@
 #define _COMNO_BASIC_SOCKET_H_
 
 #include <string>
-#include <fcntl.h>
-#include <sys/ioctl.h>
 
 #include "comno/option/socket_option_ops.h"
+#include "comno/impl/detail/socket_ops.h"
 #include "comno/impl/ip/basic_endpoint.h"
 #include "comno/impl/domain/basic_endpoint.h"
 
-#include "comno/impl/exception/throw_exception.hpp"
 #include "socket_base.h"
 
 namespace comno
@@ -108,10 +106,9 @@ public:
         if( !_sock_fd.illegal() )
             return;
 
-        _sock_fd = ::socket(protocol.family(), protocol.type(), protocol.protocol());
-        if( _sock_fd.illegal() ){
-            throw_exception(errno);
-        }
+        comno::system::error_code ec;
+        _sock_fd = comno::detail::socket_ops::socket(protocol.family(), protocol.type(), protocol.protocol(), ec);
+        throw_exception(ec);
     }
 
     /**
@@ -120,7 +117,10 @@ public:
     void close()
     {
         if( is_open() ){
-            ::close(_sock_fd);
+            comno::system::error_code ec;
+            comno::detail::socket_ops::close(_sock_fd, ec);
+            throw_exception(ec);
+
             _sock_fd.reset();
         }
     }
@@ -131,21 +131,24 @@ public:
             open();
         }
 
-        if (::connect(_sock_fd, ep.data(), ep.size()) == -1 ) {
+        comno::system::error_code ec;
+        comno::detail::socket_ops::connect(_sock_fd, ep.data(), ep.size(), ec);
+        if ( ec != 0 ) {
             close();
-            throw_exception(errno);
+            throw_exception(ec);
+        }else{
+            _remote_ep = ep;
+            resolver_local_endpoint();
         }
-
-        _remote_ep = ep;
-        resolver_local_endpoint();
     }
 
     void bind(const endpoint_type& ep)
     {
+        comno::system::error_code ec;
+        comno::detail::socket_ops::bind(_sock_fd, ep.data(), ep.size(), ec);
+        comno::throw_exception(ec);
+
         local_endpoint(ep);
-        int res = ::bind(native_handle(), ep.data(), ep.size());
-        if( res == -1 )
-            comno::throw_exception(errno);
     }
 
     // shutdown socket.
@@ -160,16 +163,16 @@ public:
     template<typename option_t>
     void set_option(const option_t& opt)
     {
-        system::error_code ec;
-        option::setsockopt(_sock_fd, opt, ec);
+        comno::system::error_code ec;
+        comno::option::setsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
             throw_exception(ec);
     }
     template<typename option_t>
     void get_option(option_t& opt)
     {
-        system::error_code ec;
-        option::getsockopt(_sock_fd, opt, ec);
+        comno::system::error_code ec;
+        comno::option::getsockopt(_sock_fd, opt, ec);
         if( ec != 0 )
             throw_exception(ec);
     }
@@ -182,18 +185,22 @@ public:
 protected:
     void set_block(bool blocked)
     {
-        ::ioctl(_sock_fd, FIONBIO, blocked ? 0 : 1);
+        comno::system::error_code ec;
+        comno::detail::socket_ops::ioctl(_sock_fd, FIONBIO, blocked ? 0 : 1, ec);
+        comno::throw_exception(ec);
     }
 
 private:
     void resolver_local_endpoint()
     {
         socklen_t len = _local_ep.size();
-        int ret = ::getsockname(_sock_fd,
-                        const_cast<comno::type::sockaddr_base*>(this->_local_ep.data()),
-                        &len);
-        if( ret == -1 )
-            comno::throw_exception(errno);
+        comno::system::error_code ec;
+
+        comno::detail::socket_ops::getsockname(_sock_fd,
+            const_cast<comno::type::sockaddr_base*>(this->_local_ep.data()),
+            &len,
+            ec);
+        comno::throw_exception(ec);
     }
 
 

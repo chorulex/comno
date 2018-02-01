@@ -25,6 +25,10 @@ public:
     }
 
 public:
+    struct sockaddr* data()
+    {
+        return _impl.data();
+    }
     const struct sockaddr* data() const
     {
         return _impl.data();
